@@ -85,7 +85,7 @@ function subtitle(i){
 const SUB_ROW_HEIGHT=190;
 function shortWordFrames(i){
  const ds=timing(),sceneStart=ds.slice(0,i).reduce((a,b)=>a+b,0),sceneDuration=ds[i];
- const text=scenes[i].text.trim(),tokens=text.split(/\\s+/).filter(Boolean);
+ const text=scenes[i].text.trim(),tokens=text.split(/\s+/).filter(Boolean);
  if(!tokens.length)return [];
  if(tokens.length>50)throw Error('Scene '+(i+1)+' has over 50 words. Split it into smaller sentences.');
  const provider=wordTimings?.[i];
@@ -156,7 +156,7 @@ const shortSubtitleCache=new Map();
 function shortSpriteKey(i){return scenes[i].text+'|'+$('subtitleColor').value+'|'+$('subtitleSize').value+'|'+wordTimingSource}
 async function shortSubtitlePNG(i){
  const words=shortWordFrames(i);
- const allCount=scenes.reduce((n,s)=>n+s.text.trim().split(/\\s+/).length,0);
+ const allCount=scenes.reduce((n,s)=>n+s.text.trim().split(/\s+/).length,0);
  if(allCount>140)throw Error('Word Highlight supports up to 140 words. Shorten your script or select Classic subtitles.');
  const surface=document.createElement('canvas');surface.width=900;surface.height=SUB_ROW_HEIGHT*words.length;
  if(surface.height>9500)throw Error('Too many words in one scene for subtitle export.');
