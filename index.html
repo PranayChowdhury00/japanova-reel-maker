@@ -488,6 +488,8 @@ function checkBeforeExport(){
  }
  const media=$('media').files[0],music=$('music').files[0];
  for(const file of [media,music])if(file && file.size>200*1024*1024)throw Error('Media over 200MB: '+file.name+'. Compress the file and retry.');
+ if(isCloudLite && media && media.size>8*1024*1024)throw Error('Free cloud: background file must be under 8 MB.');
+ if(isCloudLite && music && music.size>5*1024*1024)throw Error('Free cloud: music file must be under 5 MB.');
  if($('voice').value!=='off'&&!voiceData)throw Error('Voice is missing. Generate AI Voice again.');
  if($('avatar').value!=='off'){
    const img=avatarImages[$('avatar').value+':closed'];
@@ -636,6 +638,16 @@ function updateStudioMeta(){
 }
 const oldTotal=total;total=function(){oldTotal();updateStudioMeta()};
 const oldDraw=draw;draw=function(...args){oldDraw(...args);if(!args.length||args[0]===0)updateStudioMeta()};
+
+
+// The free public Cloud Lite deployment has limited RAM, so cap output to 540p.
+// Local Windows users retain HD and Full HD.
+const isCloudLite=location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';
+if(isCloudLite){
+  $('quality').value='lite';
+  for(const option of $('quality').options)if(option.value!=='lite')option.disabled=true;
+  $('quality').title='Free cloud version supports Lite 540p; local Windows edition supports HD/Full HD';
+}
 
 syncCanvas();prepare();initAvatars();draw(0);
 </script></body></html>
