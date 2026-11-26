@@ -53,3 +53,11 @@
 - Added export preflight checks for empty/long scenes, total script words, missing presenter assets, and large background files.
 - Synthetic FFmpeg test confirmed correct row selection and playable H.264/AAC output.
 - Full online voice + Windows UI end-to-end test remains unverified.
+
+## V4.3.1 — Auto Reel Duration Hotfix (2026-11-26)
+- Voice clips now assemble to their natural total duration plus short scene/end padding rather than always padding to 30 seconds.
+- Added Auto (default) vs Fixed 30s selection.
+- FFmpeg audio and video trimming use the selected total duration; browser preview/progress/timeline and word timestamps align to it.
+- Voice Off mode uses estimated text-length playback; maximum 30 seconds remains enforced.
+- Short text no longer forces an extra ~20 seconds of dead air in Auto mode.
+- Full Windows voice-generation and MP4-export workflow awaits local verification.
