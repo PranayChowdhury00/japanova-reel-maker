@@ -68,3 +68,10 @@
 - Reuses cached voice only when settings and script exactly match the saved voice signature.
 - ZIP handling uses Python stdlib with explicit member allowlist, per-file byte limits and project schema validation.
 - Existing animated preview and MP4 export are untouched; full Windows end-to-end tests are still required.
+
+## V4.5 — Compact Responsive Studio UI (2026-11-26)
+- Replaced one long editor with Script, Presenter, Captions, Design and Scenes tabs.
+- Compact mobile preview and sticky Preview/Export footer; sticky right-side preview on desktop.
+- Collapsed verbose guidance into seven optional Help accordions.
+- Preserved IDs, rendering logic, project Save/Open, auto-duration and voice pipelines.
+- JavaScript syntax, markup structure and functional ID uniqueness checked; Windows/mobile browser tests pending.
