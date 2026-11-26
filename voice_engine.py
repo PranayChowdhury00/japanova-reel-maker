@@ -129,7 +129,7 @@ def _sync_audio(paths, durations, starts, folder, speed_factor=1.):
     filters.append(
         ''.join(f'[a{i}]' for i in range(len(paths)))
         + f'amix=inputs={len(paths)}:duration=longest:normalize=0,'
-        'apad=whole_dur=30,atrim=0:30[out]'
+        f'apad=whole_dur={sum(durations):.4f},atrim=0:{sum(durations):.4f}[out]'
     )
     output = folder / 'voice.mp3'
     command += ['-filter_complex', ';'.join(filters), '-map', '[out]',
@@ -142,7 +142,9 @@ def _sync_audio(paths, durations, starts, folder, speed_factor=1.):
         raise RuntimeError('Voice mixing produced no audio')
     return output
 
-def make_voice(scenes, voice, speed):
+def make_voice(scenes, voice, speed, duration_mode='auto'):
+    if duration_mode not in ('auto','fixed30'):
+        raise ValueError('Invalid duration mode')
     if voice not in VOICES:
         raise ValueError('Unsupported voice')
     if not isinstance(speed, (int, float)) or not .75 <= speed <= 1.4:
@@ -204,12 +206,20 @@ def make_voice(scenes, voice, speed):
             raise ValueError(
                 f'Voice needs {reserved:.1f}s. Shorten script or increase voice speed to fit 30s.'
             )
-        spare = 30 - reserved
-        weights = [max(1, len(s)) for s in captions]
-        total = sum(weights)
-        durations = [length + .13 + spare * weight / total
-                     for length, weight in zip(lengths, weights)]
-        durations[-1] += 30 - sum(durations)
+        if duration_mode == 'fixed30':
+            spare = 30 - reserved
+            weights = [max(1, len(s)) for s in captions]
+            total = sum(weights)
+            durations = [length + .13 + spare * weight / total
+                         for length, weight in zip(lengths, weights)]
+            durations[-1] += 30 - sum(durations)
+        else:
+            # Natural-length reel with modest breathing room and an ending hold.
+            # Each scene ends a little after its spoken clip, never bloated to 30s.
+            durations = [length + .22 for length in lengths]
+            durations[-1] += .65
+            if sum(durations) > 30:
+                durations[-1] = max(.1, durations[-1]-(sum(durations)-30))
         starts = []
         position = 0.
         for duration in durations:
@@ -240,6 +250,8 @@ def make_voice(scenes, voice, speed):
         return {
             'audio_base64': base64.b64encode(output.read_bytes()).decode('ascii'),
             'durations': [round(d, 5) for d in durations],
+            'total_seconds': round(sum(durations), 3),
+            'duration_mode': duration_mode,
             'voice': voice,
             'word_timings': word_timings,
             'timing_source': timing_source,
