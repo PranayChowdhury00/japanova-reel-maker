@@ -83,3 +83,9 @@
 - Preview shows practical duration and scene count instead of decorative metadata.
 - Normal success messages are hidden; errors and active job notices remain visible.
 - Static JavaScript and ID checks passed; physical device tests pending.
+
+## Cloud Lite public pilot — 2026-11-26
+- Added Render Free Docker Blueprint, ffmpeg + Bengali fonts, dynamic HOST/PORT and /health endpoint.
+- Optional CLOUD_LITE mode demands APP_PASSWORD for HTTP Basic Auth, enforces Lite 540p, bounded upload sizes and one concurrent server task.
+- Hosted UI automatically switches to Lite export; local Windows edition remains unchanged.
+- Deployment and real FFmpeg cloud export are not yet verified; free service has severe CPU/RAM limits.
