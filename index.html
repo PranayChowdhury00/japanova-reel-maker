@@ -1,4 +1,4 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.5</title>
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.5.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eff2f8;color:#15233b;font:15px system-ui,'Nirmala UI',sans-serif}header{background:linear-gradient(110deg,#111f39,#263d67);padding:20px max(20px,calc((100% - 1260px)/2));color:#fff;display:flex;justify-content:space-between;align-items:center}header b{font-size:20px}header small{color:#bbcae5}main{max-width:1260px;margin:25px auto;display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:22px;padding:0 18px}section{background:#fff;border:1px solid #dce3ef;border-radius:18px;padding:24px;box-shadow:0 8px 30px #10233b0a}h1{font-size:23px;margin:0 0 5px}h2{font-size:18px;margin:28px 0 10px}p{line-height:1.5}small{color:#61718c}label{display:block;font-weight:700;margin:14px 0 6px}input,textarea,select,button{font:inherit;width:100%;padding:11px;border:1px solid #cbd5e4;border-radius:9px;background:#fff;color:inherit}textarea{height:138px;resize:vertical}button{background:#df2e4d;color:#fff;border:none;font-weight:750;cursor:pointer;margin:10px 0 0}button:hover{filter:brightness(.96)}button:disabled{opacity:.5;cursor:wait}.secondary{background:#edf2f9;color:#233e64}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene{border:1px solid #d6dfed;background:#f8fafd;padding:14px;border-radius:12px;margin:11px 0}.scene h3{margin:0 0 5px;font-size:14px}.scene textarea{height:76px}.scene .twocol{grid-template-columns:1fr 1fr}.scene label{margin:7px 0 5px;font-size:12px}.tip{background:#eaf1fd;padding:12px 14px;border-radius:10px;color:#38527c;margin:14px 0;font-size:13px}.preview{position:sticky;top:16px;text-align:center;align-self:start}.preview canvas{display:block;margin:12px auto;width:100%;max-width:292px;aspect-ratio:9/16;background:#0c1631;border-radius:15px;box-shadow:0 14px 40px #101e3540}.preview h2{margin:2px 0}progress{width:100%;height:11px;margin-top:14px;accent-color:#e02f50}#download[hidden]{display:none}#download{display:block;text-decoration:none;color:white;background:#187b5e;border-radius:8px;padding:13px;margin-top:10px;font-weight:700}#status{overflow-wrap:anywhere;font-size:13px;color:#254b76}.swatches{display:flex;gap:9px;flex-wrap:wrap}.swatch{width:38px;height:38px;padding:0;border:3px solid #fff;box-shadow:0 0 0 1px #b9c5d5;border-radius:50%;margin:0}.swatch.active{box-shadow:0 0 0 3px #253e62}.chip{background:#e6edf6;border-radius:999px;padding:4px 10px;display:inline-block;font-size:12px;color:#3b5274}@media(max-width:850px){main{grid-template-columns:1fr}.preview{position:static}header{padding:16px}section{padding:16px}}
 
@@ -83,9 +83,42 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 .studio-panel .help[open] summary::after{content:'−'}
 .studio-panel .help[open] summary{border-bottom:1px solid #e5ecf7}
 .studio-panel .help-content{padding:10px 12px;line-height:1.55}
-</style></head><body><header><div><b>JAPANOVA EDU</b> <span class="chip">Reel Studio V4.5</span><div><small>Smart Scene · Color Typography · Motion Effects · AI Voiceover · MP4</small></div></div><b>🇯🇵</b></header>
+
+/* Minimal brand-first header, responsive bottom mobile navigation */
+.brand-header{background:#fff!important;border-bottom:1px solid #e3e9f2;color:#19304d;padding:0 18px!important;box-shadow:0 3px 14px #20395708}
+.header-inner{max-width:1240px;margin:auto;display:flex;align-items:center;gap:10px;height:66px}
+.brand-mark{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:#d83254;color:#fff;font-size:23px;font-weight:900}
+.brand-copy{display:flex;flex-direction:column;white-space:nowrap;line-height:1.2}
+.brand-copy strong{font-size:18px;letter-spacing:.3px}
+.brand-copy em{font-style:normal;color:#d83254}
+.brand-copy small{font-size:11px;color:#8190a6!important}
+.header-controls{display:flex;gap:7px;margin-left:auto}
+.header-controls button{width:auto;margin:0;padding:9px 13px;min-height:37px;border-radius:9px;background:#f1f5fa;color:#263c59;border:1px solid #e0e7f0;font-size:12px}
+.header-controls #saveProject{background:#d83254;color:#fff;border-color:#d83254}
+.studio-intro{margin-bottom:9px}.studio-intro h1{font-size:19px;margin:0}
+.preview-heading h2{margin:0;font-size:15px}
+.preview-duration{font-size:12px;font-variant-numeric:tabular-nums;font-weight:700;color:#7a89a0}
+#status[hidden]{display:none!important}
+#status.problem{display:block;padding:10px 12px;border-radius:10px;background:#fff3eb;border:1px solid #ffd5bc;color:#87431c;font-size:12px}
+#status.processing{display:block;padding:9px 12px;border-radius:10px;background:#eff4ff;color:#345b87;font-size:12px}
+@media(max-width:700px){
+ body{padding-bottom:76px}
+ .brand-header{padding:0 11px!important}
+ .header-inner{height:57px}
+ .brand-mark{width:32px;height:32px;flex-basis:32px;font-size:19px;border-radius:9px}
+ .brand-copy strong{font-size:15px}
+ .brand-copy small{font-size:10px}
+ .header-controls{gap:5px}
+ .header-controls button{padding:8px;min-height:34px}
+ .header-controls button span{display:none}
+ .studio-intro h1{font-size:17px}
+ .studio-tabs{position:fixed;bottom:0;top:auto!important;left:0;right:0;z-index:80;margin:0!important;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:7px 4px calc(7px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -5px 24px #1d34541c;border-top:1px solid #e1e8f2;border-bottom:none;gap:2px;overflow:visible}
+ .studio-tab{width:100%;white-space:normal;padding:8px 2px!important;min-width:0;font-size:10px;line-height:1.3}
+ .studio-actions{position:relative;bottom:auto;z-index:1}
+}
+</style></head><body><header class="brand-header"><div class="header-inner"><div class="brand-mark" aria-hidden="true">J</div><div class="brand-copy"><strong>JAPANOVA <em>EDU</em></strong><small>Creative Studio</small></div><div class="header-controls"><button id="openProject" type="button" title="Open saved project">📂 <span>Open</span></button><button id="saveProject" type="button" title="Save project">💾 <span>Save</span></button></div></div></header>
 <main><section class="workspace">
-<div class="studio-intro"><div><span class="eyebrow">JAPANOVA • CREATOR STUDIO</span><h1>তোমার Reel Studio</h1><small>স্ক্রিপ্ট লিখুন, Presenter বেছে নিন, Preview দেখুন ও Export করুন।</small></div><div class="status-pill"><span class="live-dot"></span>Local Studio</div></div>
+<div class="studio-intro"><div><h1>নতুন রিল তৈরি করুন</h1></div></div>
 <nav class="studio-tabs" role="tablist" aria-label="Editor sections">
 <button type="button" class="studio-tab active" id="tab-script" role="tab" aria-selected="true" aria-controls="panel-script" data-panel="script">✍️ Script</button>
 <button type="button" class="studio-tab" id="tab-presenter" role="tab" aria-selected="false" aria-controls="panel-presenter" data-panel="presenter">🧑 Presenter</button>
@@ -94,8 +127,6 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 <button type="button" class="studio-tab" id="tab-scenes" role="tab" aria-selected="false" aria-controls="panel-scenes" data-panel="scenes">🎬 Scenes</button>
 </nav>
 <div id="panel-script" class="studio-panel active" role="tabpanel" aria-labelledby="tab-script">
-<h2>Project Manager <span class="chip">Save &amp; Resume</span></h2>
-<div class="twocol"><button id="saveProject" type="button" class="secondary">💾 Save Project (.jrm)</button><button id="openProject" type="button" class="secondary">📂 Open Project (.jrm)</button></div>
 <input id="projectFile" type="file" accept=".jrm,application/octet-stream" hidden>
 <details class="tip help"><summary>ℹ️ Project file ও privacy তথ্য</summary><div class="help-content">Project File-এ Scenes, Settings, Background, Music এবং তৈরি করা Voice সেভ হবে। সর্বোচ্চ প্রতিটি Asset 80MB। বড় Video থাকলে আগে Compress করুন। এই ফাইল নিজের PC-তে রাখুন; Script ও ব্যক্তিগত Media এতে অন্তর্ভুক্ত থাকবে।</div></details>
 <label for="script">স্ক্রিপ্ট (বাংলা/English)</label><textarea id="script">জাপানে উচ্চশিক্ষার স্বপ্ন দেখছেন? এখন থেকেই জাপানি ভাষা শেখা শুরু করুন। COE ও ভিসার প্রয়োজনীয় ডকুমেন্ট প্রস্তুত রাখুন। নিয়মিত ভাষা অনুশীলন করুন। বিস্তারিত জানতে Japanova Edu ফলো করুন।</textarea>
@@ -134,8 +165,8 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 <label>Quick Color Presets</label><div class="swatches" id="swatches"></div><details class="tip help"><summary>ℹ️ Design টিপস</summary><div class="help-content">সব Scene-এর Style উপরের Settings থেকে পরিবর্তন করা যাবে। চাইলে প্রতিটি Scene-এর Color ও Transition আলাদাও করতে পারো। Live Preview এবং MP4 Export একই Text Color, Font Weight ও Effect ব্যবহার করবে।</div></details>
 </div><div id="panel-scenes" class="studio-panel" role="tabpanel" aria-labelledby="tab-scenes" hidden>
 <div class="scene-heading"><div><h2>Scene Editor <small id="total"></small></h2><p class="subtle">প্রতিটি Scene-এর লেখা, Duration ও Transition ঠিক করুন।</p></div><button id="split" class="secondary">✦ Auto Split Sentences</button></div><div id="editor"></div></div>
-<div class="studio-actions"><button id="preview" class="secondary">▶ Preview</button><button id="export">⬇ Export MP4</button></div><div class="export-feedback"><progress id="progress" max="30" value="0"></progress><p role="status" id="status" aria-live="polite"></p><a id="download" hidden>ভিডিও সেভ করুন</a></div><small class="footer-note">Local FFmpeg export • Render চলাকালে অ্যাপ বন্ধ করবেন না।</small>
-</section><section class="preview" id="livePreviewPanel"><div class="preview-heading"><div><h2>Live Preview</h2><small>9:16 • Vertical Reel</small></div><span class="preview-live"><span class="live-dot"></span> Preview</span></div><div class="canvas-wrap"><canvas id="canvas" width="720" height="1280"></canvas></div><div class="preview-meta"><span>বাংলা + English</span><span>Auto Duration • ≤30s</span></div></section></main>
+<div class="studio-actions"><button id="preview" class="secondary">▶ Preview</button><button id="export">⬇ Export MP4</button></div><div class="export-feedback"><progress id="progress" max="30" value="0"></progress><p role="status" id="status" aria-live="polite" hidden></p><a id="download" hidden>ভিডিও সেভ করুন</a></div><small class="footer-note">Local FFmpeg export • Render চলাকালে অ্যাপ বন্ধ করবেন না।</small>
+</section><section class="preview" id="livePreviewPanel"><div class="preview-heading"><h2>Preview</h2><span id="previewDuration" class="preview-duration">—</span></div><div class="canvas-wrap"><canvas id="canvas" width="720" height="1280"></canvas></div><div class="preview-meta"><span id="previewSceneCount"></span><span>9:16</span></div></section></main>
 <script>
 'use strict';const $=id=>document.getElementById(id),c=$('canvas'),ctx=c.getContext('2d'),W=1080,H=1920,presets={lite:[540,960,15],hd:[720,1280,24],full:[1080,1920,30]};
 const colors={white:['#fff','#fff'],gold:['#fff','#ffd75e'],cyan:['#f0ffff','#39e6fc'],pink:['#fff','#ff6aa7'],rainbow:['#67e5ff','#ffbd5b']};let scenes=[],durations=[],source='',bg=null,bgURL=null,raf=0,locked=false,outURL=null,fps=24;let voiceData=null,voiceURL=null,voiceSignature='',voiceBusy=false,wordTimings=null,wordTimingSource='estimated';const avatarImages={};
@@ -554,7 +585,7 @@ $('saveProject').onclick=saveProject;
 $('openProject').onclick=()=>$('projectFile').click();
 $('projectFile').onchange=()=>{if($('projectFile').files[0])loadProject($('projectFile').files[0])};
 
-async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems().map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.5.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
+async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems().map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.5.1.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
 $('media').onchange=()=>{if(bg instanceof HTMLVideoElement)bg.pause();if(bgURL)URL.revokeObjectURL(bgURL);bg=null;let f=$('media').files[0];if(!f){draw(0);return}bgURL=URL.createObjectURL(f);let el=f.type.startsWith('video')?document.createElement('video'):new Image();if(el instanceof HTMLVideoElement){el.muted=true;el.loop=true;el.playsInline=true;el.onloadeddata=()=>{bg=el;draw(0)}}else el.onload=()=>{bg=el;draw(0)};el.src=bgURL};
 $('split').onclick=()=>{try{prepare(true);draw(0)}catch(e){$('status').textContent=e.message}};
 $('preview').onclick=async()=>{try{prepare();if($('voice').value!=='off')await ensureVoice();$('status').textContent='Preview চলছে';play()}catch(e){$('status').textContent=e.message}};
@@ -583,6 +614,25 @@ studioTabs.forEach((tab,index)=>{
  });
 });
 switchStudioPanel('script');
+
+
+const statusBox=$('status');
+function showOnlyIssues(){
+ const value=(statusBox.textContent||'').trim();
+ const issue=/(error|fail|invalid|missing|exceed|too long|too large|not ready|not found|unavailable|error|failed|problem|সমস্যা|ত্রুটি|ব্যর্থ|পাওয়া যায়নি|হয়নি|নেই|দিন।|দিতে হবে)/i.test(value);
+ const processing=/(তৈরি হচ্ছে|চলছে|খুলছে|rendering|processing|প্রস্তুত হচ্ছে)/i.test(value);
+ statusBox.hidden=!issue&&!processing;
+ statusBox.classList.toggle('problem',issue);
+ statusBox.classList.toggle('processing',!issue&&processing);
+}
+new MutationObserver(showOnlyIssues).observe(statusBox,{childList:true,characterData:true,subtree:true});
+showOnlyIssues();
+function updateStudioMeta(){
+ $('previewDuration').textContent=Number.isFinite(reelLength())?reelLength().toFixed(1)+'s':'—';
+ $('previewSceneCount').textContent=scenes.length+' scene'+(scenes.length===1?'':'s');
+}
+const oldTotal=total;total=function(){oldTotal();updateStudioMeta()};
+const oldDraw=draw;draw=function(...args){oldDraw(...args);if(!args.length||args[0]===0)updateStudioMeta()};
 
 syncCanvas();prepare();initAvatars();draw(0);
 </script></body></html>
