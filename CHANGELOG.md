@@ -28,3 +28,11 @@
 - SVG assets are served locally and rasterized in the browser; no CairoSVG, external avatar downloads, paid avatar API or 3D engine required.
 - Preserved V3.4's voice narration, scene subtitles, transitions and MP4 export.
 - Export filter behavior checked with synthetic 1-second FFmpeg video and audio; Windows application end-to-end requires user testing.
+
+## V4.1 — Smart Motion Graphics (2026-11-26)
+- Added automatic recognition of COE, passport, visa, bank, university and Japan keywords in Bengali and English.
+- Added browser Canvas generated emoji motion cards, with position and size controls.
+- Added Pop & Bounce, Slide and Floating motion styles to preview and FFmpeg MP4 output.
+- Hard-capped motion overlays at one per scene and six per reel to reduce visual clutter and CPU load.
+- No paid API needed. Object timing is approximate at scene level, not word-accurate.
+- FFmpeg animation expressions passed synthetic 2-second H.264/AAC smoke tests; full Windows flow remains to be verified.
