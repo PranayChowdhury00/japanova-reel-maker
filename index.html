@@ -125,15 +125,53 @@ function motionPosition(size){
 }
 const motionCanvasCache=new Map();
 function drawMotionCard(item,target=ctx){
- const width=280,height=280;
- target.clearRect(0,0,width,height);
+ const w=280,h=280;
+ target.clearRect(0,0,w,h);
  target.save();
- target.shadowColor='rgba(0,0,0,.35)';target.shadowBlur=22;target.shadowOffsetY=12;
- target.fillStyle='#ffffff';target.beginPath();target.roundRect(12,12,width-24,height-24,34);target.fill();target.shadowColor='transparent';
- target.strokeStyle='#e1e8f3';target.lineWidth=4;target.stroke();
- target.textAlign='center';target.textBaseline='middle';
- target.font='132px "Segoe UI Emoji","Noto Color Emoji",sans-serif';target.fillText(item.emoji,width/2,118,230);
- target.fillStyle='#183452';target.font='bold 32px system-ui,Arial';target.fillText(item.label,width/2,234,240);
+ const colors={coe:'#2e74ac',bank:'#237c75',passport:'#344c83',visa:'#b04b5c',university:'#6b56a1',language:'#3e81aa',japan:'#b83f58'};
+ const accent=colors[item.id]||'#37618b';
+ target.shadowColor='#06132755';target.shadowBlur=22;target.shadowOffsetY=12;
+ target.fillStyle='#f6f9ff';target.beginPath();target.roundRect(12,12,256,256,32);target.fill();
+ target.shadowColor='transparent';
+ target.strokeStyle='#d9e5f1';target.lineWidth=3;target.stroke();
+ target.fillStyle=accent;target.beginPath();target.roundRect(25,25,230,9,5);target.fill();
+ target.fillStyle='#eaf1fb';target.beginPath();target.arc(140,116,80,0,Math.PI*2);target.fill();
+ target.strokeStyle=accent;target.lineWidth=7;target.lineJoin='round';target.lineCap='round';
+ if(item.id==='coe'||item.id==='bank'||item.id==='visa'){
+   target.fillStyle='#ffffff';target.strokeStyle='#abc0d5';target.lineWidth=5;
+   target.beginPath();target.roundRect(95,57,92,125,12);target.fill();target.stroke();
+   target.fillStyle=accent;target.fillRect(111,83,60,9);
+   target.fillStyle='#9fb5c8';target.fillRect(111,106,53,6);target.fillRect(111,121,62,6);
+   if(item.id==='bank'){
+     target.fillStyle=accent;target.fillRect(115,145,11,18);target.fillRect(134,137,11,26);target.fillRect(153,130,11,33);
+   }else{
+     target.fillStyle=accent;target.beginPath();target.arc(163,158,21,0,Math.PI*2);target.fill();
+     target.strokeStyle='white';target.lineWidth=5;target.beginPath();target.moveTo(151,157);target.lineTo(160,165);target.lineTo(175,150);target.stroke();
+   }
+ }else if(item.id==='passport'){
+   target.fillStyle='#293c73';target.strokeStyle='#a9bbd4';target.lineWidth=4;
+   target.beginPath();target.roundRect(89,51,107,137,11);target.fill();target.stroke();
+   target.strokeStyle='#e9d6a5';target.lineWidth=4;target.beginPath();target.arc(142,111,30,0,Math.PI*2);target.stroke();
+   target.beginPath();target.ellipse(142,111,14,30,0,0,Math.PI*2);target.stroke();
+   target.beginPath();target.moveTo(112,111);target.lineTo(172,111);target.stroke();
+ }else if(item.id==='university'){
+   target.fillStyle=accent;target.beginPath();target.moveTo(63,108);target.lineTo(140,70);target.lineTo(217,108);target.lineTo(140,146);target.closePath();target.fill();
+   target.strokeStyle=accent;target.lineWidth=10;target.beginPath();target.moveTo(89,138);target.lineTo(89,171);target.quadraticCurveTo(140,191,191,171);target.lineTo(191,138);target.stroke();
+   target.beginPath();target.moveTo(208,110);target.lineTo(208,167);target.stroke();
+ }else if(item.id==='language'){
+   target.fillStyle=accent;target.beginPath();target.moveTo(66,70);target.quadraticCurveTo(108,57,140,76);target.quadraticCurveTo(172,57,214,70);target.lineTo(214,170);target.quadraticCurveTo(174,158,140,179);target.quadraticCurveTo(106,158,66,170);target.closePath();target.fill();
+   target.strokeStyle='#ffffff';target.lineWidth=5;target.beginPath();target.moveTo(140,78);target.lineTo(140,178);target.stroke();
+   target.beginPath();target.moveTo(84,108);target.lineTo(121,108);target.moveTo(159,108);target.lineTo(198,108);target.stroke();
+ }else{
+   // Abstract Japan travel mark: plane and rising sun.
+   target.fillStyle='#d35c6b';target.beginPath();target.arc(159,100,43,0,Math.PI*2);target.fill();
+   target.strokeStyle=accent;target.lineWidth=14;target.beginPath();target.moveTo(62,164);target.lineTo(219,86);target.stroke();
+   target.fillStyle=accent;target.beginPath();target.moveTo(158,119);target.lineTo(202,156);target.lineTo(214,153);target.lineTo(190,108);target.closePath();target.fill();
+   target.beginPath();target.moveTo(92,143);target.lineTo(89,176);target.lineTo(78,182);target.lineTo(67,157);target.closePath();target.fill();
+ }
+ target.font='bold 22px system-ui,Arial';target.fillStyle='#223a59';
+ target.textBaseline='middle';target.textAlign='center';
+ target.fillText(item.label,140,232,232);
  target.restore();
 }
 function motionPreview(t){
