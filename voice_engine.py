@@ -63,10 +63,10 @@ async def edge_generate(scenes, voice, speed, folder):
             try:
                 async def collect():
                     # Edge offsets/durations are reported in 100-nanosecond ticks.
-                    async with __import__('aiofiles').open(dest, 'wb') as output:
+                    with dest.open('wb') as output:
                         async for chunk in edge_tts.Communicate(caption, voice=voice, rate=rate).stream():
                             if chunk['type'] == 'audio':
-                                await output.write(chunk['data'])
+                                output.write(chunk['data'])
                             elif chunk['type'] == 'WordBoundary':
                                 events.append({
                                     'text': chunk['text'],
