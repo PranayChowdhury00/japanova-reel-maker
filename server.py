@@ -1,5 +1,5 @@
 """Local-only Reel Maker API with FFmpeg transitions."""
-import http.server, json, pathlib, shutil, subprocess, tempfile, threading, webbrowser
+import http.server, json, pathlib, shutil, subprocess, tempfile, threading, webbrowser, zipfile, io, base64
 from urllib.parse import urlsplit,parse_qs
 from voice_engine import make_voice
 from avatar_engine import presenter_svg, mouth_intervals, open_expression
@@ -9,6 +9,39 @@ from email.policy import default
 ROOT = pathlib.Path(__file__).resolve().parent
 QUALITY = {'lite':(540,960,15),'hd':(720,1280,24),'full':(1080,1920,30)}
 TRANSITIONS = {'fade','slide-up','slide-left'}
+PROJECT_FILE_LIMIT = 80 * 1024 * 1024
+PROJECT_TOTAL_LIMIT = 170 * 1024 * 1024
+PROJECT_MIME = 'application/octet-stream'
+def parse_form(headers, payload):
+    kind=headers.get('Content-Type','')
+    if not kind.startswith('multipart/form-data;'):
+        raise ValueError('Expected multipart form')
+    head=('Content-Type: '+kind+'\r\nMIME-Version: 1.0\r\n\r\n').encode()
+    msg=BytesParser(policy=default).parsebytes(head+payload)
+    return {part.get_param('name',header='content-disposition'):part for part in msg.iter_parts()}
+
+def project_json(data):
+    project=json.loads(data)
+    if not isinstance(project,dict) or project.get('format')!='japanova-reel-project' or project.get('version')!=1:
+        raise ValueError('Not a supported Japanova project')
+    if not isinstance(project.get('script'),str) or len(project['script'])>3000:
+        raise ValueError('Project script invalid')
+    scenes=project.get('scenes',[])
+    if not isinstance(scenes,list) or not 1<=len(scenes)<=20 or any(
+        not isinstance(s,dict) or not isinstance(s.get('text'),str) or len(s['text'])>400
+        for s in scenes
+    ):raise ValueError('Invalid project scenes')
+    settings=project.get('settings',{})
+    if not isinstance(settings,dict) or len(settings)>50 or any(
+        not isinstance(k,str) or not isinstance(v,(str,int,float,bool))
+        for k,v in settings.items()
+    ):raise ValueError('Invalid project settings')
+    durations=project.get('durations',[])
+    if not isinstance(durations,list) or len(durations)!=len(scenes) or any(
+        not isinstance(d,(float,int)) or isinstance(d,bool) or not .04<=d<=30 for d in durations
+    ) or not .5<=sum(durations)<=30.05:raise ValueError('Invalid project durations')
+    return project
+
 
 def make_command(p, settings, media, music, still=False, has_voice=False):
     w,h,fps=QUALITY[settings['quality']]
@@ -239,8 +272,59 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header('Cache-Control','no-store')
         self.end_headers();self.wfile.write(data)
     def do_POST(self):
-        if self.path not in ('/render','/voice'):self.send_error(404);return
+        if self.path not in ('/render','/voice','/project/save','/project/load'):self.send_error(404);return
         try:
+            if self.path in ('/project/save','/project/load'):
+                n=int(self.headers.get('Content-Length','0'))
+                if not 0<n<PROJECT_TOTAL_LIMIT:raise ValueError('Project request too large')
+                parts=parse_form(self.headers,self.rfile.read(n))
+                if self.path=='/project/save':
+                    if 'project' not in parts:raise ValueError('Missing project settings')
+                    data=parts['project'].get_payload(decode=True)
+                    project=project_json(data)
+                    archive=io.BytesIO()
+                    manifest={}
+                    with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=3,allowZip64=False) as z:
+                        for key,filename in [('media','assets/media'),('music','assets/music'),('voice','assets/voice.mp3')]:
+                            if key not in parts:continue
+                            content=parts[key].get_payload(decode=True)
+                            if len(content)>PROJECT_FILE_LIMIT:raise ValueError(f'{key} too large for portable project (80 MB max)')
+                            z.writestr(filename,content)
+                            manifest[key]={'name':parts[key].get_filename() or key,'type':parts[key].get_content_type(),'size':len(content)}
+                        project['assets']=manifest
+                        z.writestr('project.json',json.dumps(project,ensure_ascii=False))
+                    content=archive.getvalue()
+                    self.send_response(200)
+                    self.send_header('Content-Type','application/octet-stream')
+                    self.send_header('Content-Disposition','attachment; filename="japanova-project.jrm"')
+                    self.send_header('Content-Length',str(len(content)))
+                    self.end_headers();self.wfile.write(content);return
+                if 'projectFile' not in parts:raise ValueError('Choose a .jrm project')
+                payload=parts['projectFile'].get_payload(decode=True)
+                if len(payload)>PROJECT_TOTAL_LIMIT:raise ValueError('Project exceeds 170 MB')
+                with zipfile.ZipFile(io.BytesIO(payload)) as z:
+                    members=z.namelist()
+                    if len(members)>5 or not set(members).issubset({'project.json','assets/media','assets/music','assets/voice.mp3'}):
+                        raise ValueError('Unknown files in project archive')
+                    if 'project.json' not in members or z.getinfo('project.json').file_size>100000:
+                        raise ValueError('Invalid project manifest')
+                    for name in members:
+                        if z.getinfo(name).file_size>PROJECT_FILE_LIMIT:raise ValueError('Asset too large in project')
+                    if sum(z.getinfo(name).file_size for name in members)>PROJECT_TOTAL_LIMIT:
+                        raise ValueError('Project uncompressed size too large')
+                    project=project_json(z.read('project.json'))
+                    assets={}
+                    for key,filename in [('media','assets/media'),('music','assets/music'),('voice','assets/voice.mp3')]:
+                        if filename not in members:continue
+                        meta=project.get('assets',{}).get(key,{})
+                        content=z.read(filename)
+                        assets[key]={'name':str(meta.get('name',key))[:160], 'type':str(meta.get('type','application/octet-stream'))[:120],
+                                     'data':base64.b64encode(content).decode('ascii')}
+                    project['loaded_assets']=assets
+                encoded=json.dumps(project,ensure_ascii=False).encode('utf8')
+                self.send_response(200);self.send_header('Content-Type','application/json; charset=utf-8')
+                self.send_header('Content-Length',str(len(encoded)))
+                self.end_headers();self.wfile.write(encoded);return
             if self.path=='/voice':
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<32000:raise ValueError('Invalid voice request size')
