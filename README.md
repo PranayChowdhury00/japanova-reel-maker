@@ -1,4 +1,4 @@
-# Japanova Reel Maker V3.3 — AI Voice Studio
+# Japanova Reel Maker V3.4 — AI Voice Studio
 
 A **local Windows reel editor** for 30-second Bengali/English videos. It combines HTML canvas typography and transitions with a Python + FFmpeg CPU renderer. New in V3.3: optional online AI voiceover and synced captions.
 
@@ -45,3 +45,12 @@ Edge TTS sometimes returns no audio even with valid text. The app now retries Ed
 6. If **both** providers fail, check connection/firewall and retry later. Voice Off still allows silent/music-only MP4 export.
 
 This fallback is not an official Microsoft/Google commercial API or uptime guarantee. Check provider usage terms before commercial publishing. Do not bypass service blocks or quotas.
+
+## V3.4 Auto Subtitle Studio
+- Enable or disable burned-in subtitles for 30-second reels.
+- Choose Yellow + Outline, White + Shadow, or Cyan + Dark Box.
+- Adjust subtitle size and lower-third position (safe margins).
+- Subtitles are generated from each edited scene's text; no new API or payment is needed.
+- With AI narration, caption changes follow scene-level voice durations. These are **not** word-by-word timestamps or speech recognition.
+- Exported H.264 MP4 has subtitle text burned into frames (viewers cannot turn it off after export).
+- If you edit scene text, regenerate AI voice before export to update synchronization.
