@@ -27,8 +27,22 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
     cmd+=['-loop','1','-framerate',str(fps),'-i',str(p/'base.png')]
     first=base+1
     for i in range(count):cmd+=['-loop','1','-framerate',str(fps),'-i',str(p/f'scene{i}.png')]
-    subtitle_count=count if settings.get('subtitles',False) else 0
-    if not isinstance(settings.get('subtitles',False),bool): raise ValueError('Invalid subtitle flag')
+    subtitle_mode=settings.get('subtitle_mode','scene' if settings.get('subtitles',False) else 'off')
+    if subtitle_mode not in ('off','scene','short'):raise ValueError('Invalid subtitle mode')
+    subtitle_count=count if subtitle_mode!='off' else 0
+    sprite_rows=settings.get('subtitle_rows',[])
+    if subtitle_mode=='short':
+        if not isinstance(sprite_rows,list) or len(sprite_rows)!=count:raise ValueError('Subtitle timing count mismatch')
+        if sum(len(x) for x in sprite_rows if isinstance(x,list))>140:raise ValueError('Too many highlighted words (140 max)')
+        cursor=0.
+        for scene,d in enumerate(durations):
+            rows=sprite_rows[scene]
+            if not isinstance(rows,list) or not 1<=len(rows)<=50:raise ValueError('Too many subtitle rows in scene')
+            if any(not isinstance(x,(int,float)) or not cursor-.04<=x<=cursor+d+.04 for x in rows):
+                raise ValueError('Subtitle word time outside its scene')
+            if any(rows[k+1]<rows[k] for k in range(len(rows)-1)):raise ValueError('Subtitle timestamps unsorted')
+            cursor+=d
+
     for i in range(subtitle_count):
         path=p/f'subtitle{i}.png'
         if not path.is_file(): raise ValueError(f'Missing subtitle image {i}')
@@ -158,13 +172,35 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         for i,duration in enumerate(durations):
             end=start+duration
             label=f'caption{i}'
-            # Enable each transparent caption only during its scene;
-            # overlays are looped so they don't expire mid-video.
-            filters.append(
-                f'[{previous}][{first+count+i}:v]'
-                f'overlay=x=0:y=0:shortest=0:eof_action=pass:'
-                f'enable=between(t\\,{start:.6f}\\,{end:.6f})[{label}]'
-            )
+            input_index=first+count+i
+            if subtitle_mode=='short':
+                # Each scene supplies ONE vertical PNG sprite, with a caption
+                # for each word. Dynamic crop selects rows without hundreds
+                # of independent FFmpeg input streams.
+                rows=sprite_rows[i]
+                # FFmpeg crop y is evaluated once per frame (expression 't').
+                # Starts are absolute timeline timestamps.
+                row_expr='0'
+                for j,word_start in enumerate(rows[1:],1):
+                    row_expr+=f'+gte(t\\,{float(word_start):.5f})'
+                source=f'wordcrop{i}'
+                filters.append(
+                    f'[{input_index}:v]crop=w=900:h=190:x=0:y=190*({row_expr}),'
+                    f'scale={round(w*900/1080)}:{round(h*190/1920)},format=rgba[{source}]'
+                )
+                position='middle' if settings.get('subtitle_position')=='middle' else 'lower'
+                cy=1200 if position=='middle' else 1360
+                oy=round(cy*h/1920)
+                ox=round((w-round(w*900/1080))/2)
+                filters.append(
+                    f'[{previous}][{source}]overlay=x={ox}:y={oy}:shortest=0:'
+                    f'eof_action=pass:enable=between(t\\,{start:.5f}\\,{end:.5f})[{label}]'
+                )
+            else:
+                filters.append(
+                    f'[{previous}][{input_index}:v]overlay=x=0:y=0:'
+                    f'shortest=0:eof_action=pass:enable=between(t\\,{start:.6f}\\,{end:.6f})[{label}]'
+                )
             previous=label
             start=end
     if has_voice:
@@ -250,5 +286,5 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__=='__main__':
     s=http.server.ThreadingHTTPServer(('127.0.0.1',8765),Handler)
     threading.Timer(.5,lambda:webbrowser.open('http://127.0.0.1:8765')).start()
-    print('Japanova Reel Maker V4.2: http://127.0.0.1:8765')
+    print('Japanova Reel Maker V4.3: http://127.0.0.1:8765')
     s.serve_forever()
