@@ -111,7 +111,7 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
             for frag in fragments[1:]:result=f'max({result},{frag})'
             return result
         def escaped(expr):
-            return expr.replace(',',r'\\,')
+            return expr.replace(',',r'\,')
         frame_focus=escaped(ff_focus(f'n/{fps}'))
         time_focus=escaped(ff_focus('t'))
         for j,pose in enumerate(('closed','open','blink')):
