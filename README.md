@@ -1,29 +1,18 @@
-# Japanova Reel Maker V4.3.1 — Auto Reel Duration Fix
+# Japanova Reel Maker V4.4 — Save & Resume Projects
 
-V4.3.1 fixes reels that remained 30 seconds long even when the narration was only 8–10 seconds.
+V4.4 adds a **portable Save Project / Open Project workflow** on top of the V4.3.1 reel editor. Your project file can be moved to another Windows computer with Japanova Reel Maker.
 
-## Fixed: Video Duration follows narration
+## New — Save & Resume
 
-**Video Duration** now has two modes:
+- **Save Project (.jrm)** downloads a ZIP-based project file that contains `project.json` and, when present, background picture/video, music and previously generated voice audio.
+- **Open Project (.jrm)** restores the script, individual edited scenes, scene durations, scene color/transition choices, voice settings, presenter, Smart Focus, subtitle settings, branding, quality and Auto/Fixed duration mode.
+- **Voice is reusable** when the previously generated MP3 and exact matching narration settings are included; otherwise click Generate & Listen Voice.
+- The ZIP uses Python's built-in `zipfile`. No new pip packages or paid API needed for saving/loading.
+- Each media/voice asset can be **up to 80MB**. The total project upload is limited to about **170MB**, so compress larger videos first. Files live in your downloaded .jrm project rather than a cloud database.
 
-- **Auto — Ends with speech (default):** use actual generated voice clip lengths, ~0.22 seconds of space after each scene and a ~0.65-second final hold. A short script can export a short reel, rather than a 30-second video filled with silence.
-- **Fixed 30 Seconds (optional):** retain the former 30-second behaviour for a planned campaign where a full 30-second clip is required.
+## How to update on Windows
 
-The duration is shared consistently by:
-- AI voice assembly and audio padding
-- Scene timings and word-highlight subtitle timestamps
-- Live preview playback and progress bar
-- Presenter/Smart Focus timelines
-- FFmpeg video output and audio trimming
-
-With **Voice Off**, the app uses an approximate speaking-rate estimate based on word count (about 2.35 words/second), a short scene pause and final hold. This estimate is not speech analysis.
-
-**Maximum reel length remains 30 seconds.** If speech is too long, the generator asks you to shorten the script or adjust the voice speed; it does not silently truncate the words.
-
-## Update on Windows
-
-1. Close the running Japanova app/START.bat console.
-2. From PowerShell:
+Close the existing START.bat window, then run:
 
 ```powershell
 cd C:\Users\USER\japanova-reel-maker
@@ -31,20 +20,25 @@ git pull origin main
 .\START.bat
 ```
 
-3. In Chrome, press **Ctrl + Shift + R**.
-4. Select **Video Duration → Auto — Ends with speech**.
-5. Generate AI Voice again (old cached voice timings may still reflect 30 seconds), listen to it, then Export MP4.
+Refresh Chrome with **Ctrl + Shift + R**.
 
-### Recommended regression script
+## How to test
 
-`জাপানে পড়াশোনা করতে চাইলে আগে COE প্রস্তুত করুন। পাসপোর্ট আর ব্যাংক স্টেটমেন্ট ঠিক রাখুন।`
+1. Paste a script and edit scene text or colors. Select a presenter, Smart Focus settings, video quality, and optional background/music.
+2. Optionally Generate Voice. Click **Save Project (.jrm)**. Keep the downloaded file.
+3. Refresh the browser to reset the editor, choose **Open Project (.jrm)**, and select your downloaded file.
+4. Verify restored script, edited scenes, chosen settings, background/music and voice.
+5. Preview or export MP4. If the voice wasn't included, generate voice after opening.
 
-The video should now be near the spoken narration length plus ~1 second of small scene gaps/end hold. Its exact seconds depend on the selected TTS voice and speed. It must **not** stretch to 30 seconds in Auto mode.
+## Privacy and limitations
 
-## Other features retained
-V4.3 Short Captions + Word Highlight, Edge WordBoundary (estimated when unavailable), Classic Subtitles, 2.5D presenter, Smart Focus, minimal animation, background media, music, export checks, and HD/Full HD MP4.
+- **No cloud storage**: Projects are saved as local files. Protect your .jrm file if it contains private scripts, students' photos, office clips, or other sensitive content.
+- Save is **manual**, not automatic. Download the latest project before closing or refreshing.
+- Moving the project between computers may yield different fonts/emoji or TTS voice availability.
+- Voice matching checks the exact script/voice/speed/duration settings. Changed voice settings invalidate the saved MP3.
+- Imported projects are checked against a restricted ZIP member list and scene/settings schema; do not open untrusted files.
+- This code has been inspected and the browser JavaScript syntax checked. **Full Windows browser upload/download and 30-second MP4 end-to-end testing still needs local verification**.
+- All project ZIP work uses local Python. Voice generation is still performed through online Edge TTS or backup Google TTS and depends on their usage terms.
 
-## Testing notes
-- Checked relevant client-side JavaScript syntax and presence of per-mode duration handling in voice generation, preview, and MP4 export.
-- A full remote Windows FFmpeg + Edge TTS end-to-end test is **not possible here**; please check the output locally and send the error text if your test fails.
-- Edge TTS and Google backup involve online speech services; commercial use is subject to provider terms.
+## Retained capabilities
+V4.3.1 Auto reel duration (natural-length or Fixed 30 seconds); V4.3 word-highlight short captions; V4.2 restrained illustrated motion and presenter shrink; optional 2.5D formal boy/girl presenter and music; Lite/HD/Full HD FFmpeg export.
