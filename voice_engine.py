@@ -33,20 +33,47 @@ def clean_speech(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
+def estimate_words(caption, length):
+    """Provide explicitly approximate timings for fallback TTS or missing metadata."""
+    words = caption.split()
+    if not words: return []
+    weights = [max(1, len(word.strip('.,!?।;:'))) for word in words]
+    total = sum(weights)
+    elapsed = 0.0
+    result = []
+    for word, weight in zip(words, weights):
+        duration = length * weight / total
+        result.append({'text': word, 'start': round(elapsed, 4),
+                       'duration': round(duration, 4)})
+        elapsed += duration
+    return result
+
+
 async def edge_generate(scenes, voice, speed, folder):
     import edge_tts
-    paths = []
+    paths, scene_boundaries = [], []
     rate = f'{round((speed - 1) * 100):+d}%'
     for i, caption in enumerate(scenes):
         dest = folder / f'voice-{i}.mp3'
         error = None
+        events = []
         for attempt in range(3):
             dest.unlink(missing_ok=True)
+            events = []
             try:
-                await asyncio.wait_for(
-                    edge_tts.Communicate(caption, voice=voice, rate=rate).save(str(dest)),
-                    timeout=35
-                )
+                async def collect():
+                    # Edge offsets/durations are reported in 100-nanosecond ticks.
+                    async with __import__('aiofiles').open(dest, 'wb') as output:
+                        async for chunk in edge_tts.Communicate(caption, voice=voice, rate=rate).stream():
+                            if chunk['type'] == 'audio':
+                                await output.write(chunk['data'])
+                            elif chunk['type'] == 'WordBoundary':
+                                events.append({
+                                    'text': chunk['text'],
+                                    'start': max(0., chunk['offset'] / 10000000.),
+                                    'duration': max(.02, chunk['duration'] / 10000000.)
+                                })
+                await asyncio.wait_for(collect(), timeout=45)
                 if dest.exists() and dest.stat().st_size > 300:
                     error = None
                     break
@@ -58,7 +85,8 @@ async def edge_generate(scenes, voice, speed, folder):
         if error is not None:
             raise RuntimeError(f'Edge TTS failed at scene {i+1}: {type(error).__name__}: {str(error)[:170]}')
         paths.append(dest)
-    return paths
+        scene_boundaries.append(events)
+    return paths, scene_boundaries
 
 def google_generate(scenes, voice, speed, folder):
     from gtts import gTTS
@@ -135,12 +163,13 @@ def make_voice(scenes, voice, speed):
         folder = pathlib.Path(temp)
         primary_error = ''
         try:
-            paths = asyncio.run(edge_generate(captions, voice, speed, folder))
+            paths, scene_boundaries = asyncio.run(edge_generate(captions, voice, speed, folder))
             provider = 'Edge Neural Voice'
         except Exception as exc:
             primary_error = str(exc)
             try:
                 paths = google_generate(captions, voice, speed, folder)
+                scene_boundaries = [[] for _ in paths]
                 provider = 'Google Translate TTS (backup)'
             except Exception as backup_exc:
                 raise RuntimeError(
@@ -187,11 +216,33 @@ def make_voice(scenes, voice, speed):
             starts.append(position)
             position += duration
 
+        # Exact-ish Edge word boundaries when provider text tokenization matches
+        # user scene tokenization. Otherwise mark estimates; never claim exact.
+        word_timings = []
+        timing_source = 'edge'
+        for caption, length, offset, events in zip(captions, lengths, starts, scene_boundaries):
+            tokens = caption.split()
+            if len(events) == len(tokens) and all(e['start'] <= length + .1 for e in events):
+                timings = [
+                    {'text': token, 'start': round(offset + e['start'], 4),
+                     'duration': round(min(max(.03, e['duration']), max(.03, length-e['start'])), 4)}
+                    for token, e in zip(tokens, events)
+                ]
+            else:
+                timing_source = 'estimated'
+                timings = [
+                    {**word, 'start': round(offset + word['start'], 4)}
+                    for word in estimate_words(caption, length)
+                ]
+            word_timings.append(timings)
+
         output = _sync_audio(paths, durations, starts, folder)
         return {
             'audio_base64': base64.b64encode(output.read_bytes()).decode('ascii'),
             'durations': [round(d, 5) for d in durations],
             'voice': voice,
+            'word_timings': word_timings,
+            'timing_source': timing_source,
             'spoken_seconds': round(sum(lengths), 2),
             'provider': provider,
             'notice': ('Backup voice does not support male/female selection.'
