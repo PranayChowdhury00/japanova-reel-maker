@@ -48,7 +48,7 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         filters.append(f'[{previous}][txt{i}]overlay=x={x}:y={y}:shortest=0:eof_action=pass:format=auto[compose{i}]')
         previous=f'compose{i}';start=end
     if has_voice:
-        filters.append(f'[{voice_index}:a]aresample=44100,volume=1.0,asplit=2[voiceSide][voiceMain]')
+        filters.append(f'[{voice_index}:a]aresample=44100,volume=1.0,asplit=2[voiceSide][voiceMain]' if music else f'[{voice_index}:a]aresample=44100,volume=1.0[voiceMain]')
         if music:
             filters.append(f'[{audio}:a]aresample=44100,volume=0.20[music]')
             filters.append('[music][voiceSide]sidechaincompress=threshold=0.015:ratio=8:attack=40:release=350[ducked]')
@@ -94,7 +94,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     data=part.get_payload(decode=True)
                     if key=='settings':settings=json.loads(data)
                     elif key in ('base','media','music','voice') or (key and key.startswith('scene') and key[5:].isdigit()):
-                        name='base.png' if key=='base' else f'{key}.png' if key.startswith('scene') else key
+                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'{key}.png' if key.startswith('scene') else key
                         (p/name).write_bytes(data)
                         if key=='media':media=True;still=part.get_content_type().startswith('image/')
                         if key=='music':music=True
