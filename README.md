@@ -1,56 +1,37 @@
-# Japanova Reel Maker V3.4 — AI Voice Studio
+# Japanova Reel Maker V4.0 — AI Presenter Studio
 
-A **local Windows reel editor** for 30-second Bengali/English videos. It combines HTML canvas typography and transitions with a Python + FFmpeg CPU renderer. New in V3.3: optional online AI voiceover and synced captions.
+**V4.0 (preview release)** adds an optional 2.5D illustrated presenter to the existing local Windows reel editor. This is deliberately **not** a rigged 3D human or true phoneme-based lip-sync model.
 
-## What's new
-- Bengali voices: **Pradeep** (male) and **Nabanita** (female)
-- English voices: Andrew (male), Aria (female)
-- Speech speed control (0.75–1.40x), Generate & Listen Voice, Stop Voice
-- Voice synchronization per complete scene, with 30-second maximum and no forced speech truncation
-- Music ducking (automatic music reduction when voice is speaking)
-- Voice preview, auto-generation on MP4 export, optional music-only export
+### Features
+- Select **Formal Boy**, **Formal Girl**, or **Off (Classic Text Reel)**.
+- Presenter position: left, center, or right.
+- Eyes blink automatically during previews and final MP4 output.
+- During exports with AI voice narration, mouth-open intervals are estimated from speech amplitude (RMS), not from consonants/vowels. This is approximate audio-reactive speaking animation.
+- 30-second H.264 MP4 retains optional Bengali/English voice, background music, subtitles, images/video, and previous brand styling.
+- No new paid API or heavy 3D graphics engine. Presenter SVG portraits render in the browser and are exported as PNG poses; FFmpeg composites them into video.
+- The previous 3.4 text-only workflow remains available by setting Presenter = Off.
 
-All V3.2 features remain: colorful bold text, shadows, gradients, transitions, scene editing, backgrounds, HD/Full HD MP4 export.
+### Update on Windows
+Stop the running app, then open PowerShell:
 
-## Install & run on Windows
+```powershell
+cd C:\Users\USER\japanova-reel-maker
+git pull origin main
+.\START.bat
+```
+Refresh the browser with **Ctrl+Shift+R**.
 
-1. Clone: `git clone https://github.com/PranayChowdhury00/japanova-reel-maker.git`
-2. Open the folder and run `setup.bat` (Python, FFmpeg, and `edge-tts` dependency). If Python and FFmpeg are installed, `py -3 -m pip install -r requirements.txt` is sufficient.
-3. Start `START.bat`. Open http://127.0.0.1:8765 if not opened automatically.
-4. Paste a short script, split scenes, choose a voice, click **Generate & Listen Voice**, then **Export 30s MP4**.
-5. If the voice exceeds 30 seconds, shorten the script or increase speed. It will never silently cut off the spoken text.
+### Recommended first test
+1. Choose **Formal Boy**, **HD 720p**, subtitle **On**, and a short Bengali script.
+2. Click **Generate & Listen Voice**, then **Live Preview**.
+3. Click **Export 30s MP4**. Rendering will be CPU-intensive, especially at 1080p. Close other heavy apps.
+4. Check the downloaded video for mouth movement, blink, narration and subtitles. Send back any error from the terminal or interface.
 
-## Privacy / service notes
-
-- Text, videos and rendered MP4 are processed locally **except** for optional AI voice synthesis.
-- `edge-tts` sends text over the Internet to a Microsoft speech service. It is an unofficial client and the free route may stop working or be rate-limited.
-- No paid API key is required for this experimental option, but it is **not** a guaranteed free commercial TTS service. Check service/licensing terms before publishing commercial content; use an appropriately licensed TTS provider where necessary.
-- A backup music-only workflow is available by choosing *No Voiceover*.
-- Do not expose the local development server to the public Internet.
-
-## Testing
-
-- Python syntax checks and local synthetic audio rendering test completed in this environment.
-- Full remote Edge TTS playback requires an online Windows test because this environment does not have access to the Microsoft speech endpoint.
-- Voice-to-scene timings are derived from each rendered speech clip, but FFmpeg frame rounding can create minor timing differences.
-## Troubleshooting: `No audio was received` (v3.3.1)
-
-Edge TTS sometimes returns no audio even with valid text. The app now retries Edge TTS up to three times and automatically tries the Google Translate TTS fallback if Edge fails. Both providers need an internet connection and can be unavailable.
-
-1. Close the app and run `git pull origin main`.
-2. Run `py -3 -m pip install --upgrade -r requirements.txt`.
-3. Restart with `.\\START.bat`, then refresh with `Ctrl+Shift+R`.
-4. Try a short Bengali sentence, e.g. `জাপানে আপনাকে স্বাগতম।` using Bengali Male or Female.
-5. Check the status: it states which provider produced audio. Backup TTS does not preserve male/female voice choice.
-6. If **both** providers fail, check connection/firewall and retry later. Voice Off still allows silent/music-only MP4 export.
-
-This fallback is not an official Microsoft/Google commercial API or uptime guarantee. Check provider usage terms before commercial publishing. Do not bypass service blocks or quotas.
-
-## V3.4 Auto Subtitle Studio
-- Enable or disable burned-in subtitles for 30-second reels.
-- Choose Yellow + Outline, White + Shadow, or Cyan + Dark Box.
-- Adjust subtitle size and lower-third position (safe margins).
-- Subtitles are generated from each edited scene's text; no new API or payment is needed.
-- With AI narration, caption changes follow scene-level voice durations. These are **not** word-by-word timestamps or speech recognition.
-- Exported H.264 MP4 has subtitle text burned into frames (viewers cannot turn it off after export).
-- If you edit scene text, regenerate AI voice before export to update synchronization.
+### Limits and safeguards
+- **Beta:** The synthetic FFmpeg overlay technique was tested, but the complete Windows end-to-end flow has not been verified remotely.
+- Speech-energy mouth activity is an approximation; it is **not** word-perfect lip sync.
+- This is a stylized 2.5D presenter, **not full 3D**. It has a static upper body, blinking, mouth poses; no hand animation.
+- Avatar is SVG/Canvas-based and needs no additional model downloads or paid GPU API. It can take longer to render than V3.4.
+- Edge TTS and backup gTTS require internet. Edge is an unofficial Microsoft client. Check commercial licensing terms before publishing reels.
+- All video composition is local. Text is sent to online TTS providers only when AI voice is enabled.
+- The default server binds only to 127.0.0.1; do not expose it publicly.
