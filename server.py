@@ -43,7 +43,31 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         if not path.is_file():raise ValueError('Missing avatar image')
         cmd+=['-loop','1','-framerate',str(fps),'-i',str(path)]
     avatar_index=first+count+subtitle_count
-    audio=avatar_index+avatar_count
+    motion_items=settings.get('motion_items',[])
+    if not isinstance(motion_items,list) or len(motion_items)>6:raise ValueError('Too many motion graphics')
+    motion_style=settings.get('motion_style','bounce')
+    if motion_style not in ('bounce','slide','float'):raise ValueError('Invalid motion style')
+    motion_position=settings.get('motion_position','right')
+    if motion_position not in ('left','right','top'):raise ValueError('Invalid motion position')
+    size=settings.get('motion_size',100)
+    if not isinstance(size,(int,float)) or not 65<=size<=120:raise ValueError('Invalid motion size')
+    allowed={'coe','passport','visa','bank','university','japan'}
+    used=set()
+    scene_starts=[];cursor=0.
+    for d in durations:scene_starts.append(cursor);cursor+=d
+    for item in motion_items:
+        if not isinstance(item,dict):raise ValueError('Invalid motion item')
+        scene=item.get('scene');ident=item.get('id')
+        if not isinstance(scene,int) or not 0<=scene<count or scene in used or ident not in allowed:raise ValueError('Invalid motion keyword')
+        used.add(scene)
+        start=float(item.get('start',-1));length=float(item.get('duration',-1))
+        if not (scene_starts[scene]-.05<=start<=scene_starts[scene]+durations[scene] and .05<=length<=2.3 and start+length<=scene_starts[scene]+durations[scene]+.05):
+            raise ValueError('Motion timing must fit its scene')
+        path=p/f'motion{scene}.png'
+        if not path.is_file():raise ValueError('Missing motion image')
+        cmd+=['-loop','1','-framerate',str(fps),'-i',str(path)]
+    motion_index=avatar_index+avatar_count
+    audio=motion_index+len(motion_items)
     cmd+=['-stream_loop','-1','-i',str(p/'music')] if music else ['-f','lavfi','-i','anullsrc=r=44100:cl=stereo']
     voice_index=None
     if has_voice:
@@ -84,6 +108,25 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         blink='+'.join(f'between(t\\,{float(v):.2f}\\,{float(v)+.12:.2f})' for v in (2.8,6.9,11.4,16.1,20.9,26.3))
         filters.append(f'[{previous}][avatar2]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass:enable={blink}[blinking]')
         previous='blinking'
+    if motion_items:
+        motion_width=max(2,round(w*(280/1080)*(size/100)/2)*2)
+        motion_height=max(2,round(h*(280/1920)*(size/100)/2)*2)
+        mx={'left':round(w*45/1080),'right':round(w-35*w/1080-motion_width),'top':round(w-65*w/1080-motion_width)}[motion_position]
+        my=round(h*(295 if motion_position=='top' else 720)/1920)
+        for j,item in enumerate(motion_items):
+            start=float(item['start']);finish=start+float(item['duration'])
+            position_x=str(mx);position_y=str(my)
+            if motion_style=='slide':
+                dist=-round(w*.18) if motion_position=='left' else round(w*.18)
+                position_x=f'if(lt(t\\,{start+.35:.5f})\\,{mx}+{dist}*(1-(t-{start:.5f})/.35)\\,{mx})'
+            elif motion_style=='bounce':
+                position_y=f'{my}-if(lt(t\\,{start+.5:.5f})\\,45*sin(3.14159265*(t-{start:.5f})/.5)\\,0)'
+            elif motion_style=='float':
+                position_y=f'{my}+{max(2,round(h*.007))}*sin(5*(t-{start:.5f}))'
+            label=f'motionout{j}'
+            filters.append(f'[{motion_index+j}:v]scale={motion_width}:{motion_height},format=rgba[motionasset{j}]')
+            filters.append(f'[{previous}][motionasset{j}]overlay=x={position_x}:y={position_y}:shortest=0:eof_action=pass:enable=between(t\\,{start:.5f}\\,{finish:.5f})[{label}]')
+            previous=label
     if subtitle_count:
         start=0.
         for i,duration in enumerate(durations):
@@ -157,8 +200,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     key=part.get_param('name',header='content-disposition')
                     data=part.get_payload(decode=True)
                     if key=='settings':settings=json.loads(data)
-                    elif key in ('base','media','music','voice') or (key and (key.startswith('scene') and key[5:].isdigit() or key.startswith('subtitle') and key[8:].isdigit() or key in ('avatar_closed','avatar_open','avatar_blink'))):
-                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'avatar-{key[7:]}.png' if key.startswith('avatar_') else f'{key}.png' if key.startswith(('scene','subtitle')) else key
+                    elif key in ('base','media','music','voice') or (key and (key.startswith('scene') and key[5:].isdigit() or key.startswith('subtitle') and key[8:].isdigit() or key in ('avatar_closed','avatar_open','avatar_blink') or key.startswith('motion') and key[6:].isdigit())):
+                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'avatar-{key[7:]}.png' if key.startswith('avatar_') else f'{key}.png' if key.startswith(('scene','subtitle','motion')) else key
                         (p/name).write_bytes(data)
                         if key=='media':media=True;still=part.get_content_type().startswith('image/')
                         if key=='music':music=True
@@ -181,5 +224,5 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__=='__main__':
     s=http.server.ThreadingHTTPServer(('127.0.0.1',8765),Handler)
     threading.Timer(.5,lambda:webbrowser.open('http://127.0.0.1:8765')).start()
-    print('Japanova Reel Maker V4.0: http://127.0.0.1:8765')
+    print('Japanova Reel Maker V4.1: http://127.0.0.1:8765')
     s.serve_forever()
