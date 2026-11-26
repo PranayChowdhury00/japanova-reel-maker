@@ -2,7 +2,7 @@
 import http.server, json, pathlib, shutil, subprocess, tempfile, threading, webbrowser
 from urllib.parse import urlsplit,parse_qs
 from voice_engine import make_voice
-from avatar_engine import presenter_svg, build_images, mouth_intervals, open_expression
+from avatar_engine import presenter_svg, mouth_intervals, open_expression
 from email.parser import BytesParser
 from email.policy import default
 
@@ -157,15 +157,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     key=part.get_param('name',header='content-disposition')
                     data=part.get_payload(decode=True)
                     if key=='settings':settings=json.loads(data)
-                    elif key in ('base','media','music','voice') or (key and (key.startswith('scene') and key[5:].isdigit() or key.startswith('subtitle') and key[8:].isdigit())):
-                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'{key}.png' if key.startswith(('scene','subtitle')) else key
+                    elif key in ('base','media','music','voice') or (key and (key.startswith('scene') and key[5:].isdigit() or key.startswith('subtitle') and key[8:].isdigit() or key in ('avatar_closed','avatar_open','avatar_blink'))):
+                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'avatar-{key[7:]}.png' if key.startswith('avatar_') else f'{key}.png' if key.startswith(('scene','subtitle')) else key
                         (p/name).write_bytes(data)
                         if key=='media':media=True;still=part.get_content_type().startswith('image/')
                         if key=='music':music=True
                         if key=='voice':has_voice=True
                 if settings is None or not (p/'base.png').is_file():raise ValueError('Missing project settings')
                 if any(not (p/f'scene{i}.png').is_file() for i in range(int(settings['count']))):raise ValueError('Missing scene image')
-                if settings.get('avatar','off')!='off':build_images(p,settings['avatar'])
+                if settings.get('avatar','off')!='off' and any(not (p/f'avatar-{pose}.png').is_file() for pose in ('closed','open','blink')):raise ValueError('Missing presenter images; refresh the page and retry')
                 cmd=make_command(p,settings,media,music,still,has_voice)
                 r=subprocess.run(cmd,capture_output=True,timeout=900)
                 if r.returncode:raise RuntimeError(r.stderr.decode(errors='replace')[-2000:])
