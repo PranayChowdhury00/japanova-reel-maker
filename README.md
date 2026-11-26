@@ -1,19 +1,29 @@
-# Japanova Reel Maker V4.3 — Professional Subtitle & Stability
+# Japanova Reel Maker V4.3.1 — Auto Reel Duration Fix
 
-A local Windows reel maker for 30-second Bengali/English social videos. It retains V4.2's optional 2.5D formal boy/girl presenter, restrained context-aware motion graphics, AI narration, music, background media, and HD/Full HD export.
+V4.3.1 fixes reels that remained 30 seconds long even when the narration was only 8–10 seconds.
 
-## New in V4.3
+## Fixed: Video Duration follows narration
 
-- **Short Captions + Word Highlight (default):** shows groups of up to four words and highlights the current word.
-- **Timing-aware:** when Edge TTS returns WordBoundary events, the app uses their positions for word highlighting. If the provider supplies no usable boundaries (including Google Translate TTS backup) or narration is Off, word timing is **estimated**, not speech-recognition-accurate. The voice status reports which timing mode was used.
-- **Classic Subtitle Mode:** the prior entire-scene subtitle remains selectable. Subtitles can be turned Off.
-- **Local subtitle rendering:** browser Canvas renders caption sprites with matching font and color styles. FFmpeg crops the appropriate sprite row for each word at export, reducing the number of video inputs compared with one PNG per word.
-- **Export validation:** checks for empty/oversized scenes, scripts over 2,500 characters, short subtitle projects over 140 words, assets not loaded, and unusually large uploads (200 MB per media file).
-- **Backward-compatible V4.2 features:** Full HD/Lite output, boy/girl presenter, scene transitions, Smart Focus animations, optional music, AI voice, and scene subtitles.
+**Video Duration** now has two modes:
+
+- **Auto — Ends with speech (default):** use actual generated voice clip lengths, ~0.22 seconds of space after each scene and a ~0.65-second final hold. A short script can export a short reel, rather than a 30-second video filled with silence.
+- **Fixed 30 Seconds (optional):** retain the former 30-second behaviour for a planned campaign where a full 30-second clip is required.
+
+The duration is shared consistently by:
+- AI voice assembly and audio padding
+- Scene timings and word-highlight subtitle timestamps
+- Live preview playback and progress bar
+- Presenter/Smart Focus timelines
+- FFmpeg video output and audio trimming
+
+With **Voice Off**, the app uses an approximate speaking-rate estimate based on word count (about 2.35 words/second), a short scene pause and final hold. This estimate is not speech analysis.
+
+**Maximum reel length remains 30 seconds.** If speech is too long, the generator asks you to shorten the script or adjust the voice speed; it does not silently truncate the words.
 
 ## Update on Windows
 
-Stop the old app before updating:
+1. Close the running Japanova app/START.bat console.
+2. From PowerShell:
 
 ```powershell
 cd C:\Users\USER\japanova-reel-maker
@@ -21,21 +31,20 @@ git pull origin main
 .\START.bat
 ```
 
-Press **Ctrl + Shift + R** in the browser. Choose **HD 720p** for your first test.
+3. In Chrome, press **Ctrl + Shift + R**.
+4. Select **Video Duration → Auto — Ends with speech**.
+5. Generate AI Voice again (old cached voice timings may still reflect 30 seconds), listen to it, then Export MP4.
 
-### Test
-1. Choose **Short Captions + Word Highlight**, Formal Boy, and Smart Focus On.
-2. Use a brief script such as: `জাপানে পড়াশোনা করতে চাইলে আগে COE প্রস্তুত করুন। পাসপোর্ট আর ব্যাংক স্টেটমেন্ট ঠিক রাখুন।`
-3. Click **Generate & Listen Voice**. Look at the status message to see if timing is Edge WordBoundary or estimated.
-4. Click **Live Preview** and then **Export 30s MP4**. Check word highlight changes in the exported file.
-5. If export fails, send the exact error from the status box or PowerShell window.
+### Recommended regression script
 
-## Technical notes / limits
+`জাপানে পড়াশোনা করতে চাইলে আগে COE প্রস্তুত করুন। পাসপোর্ট আর ব্যাংক স্টেটমেন্ট ঠিক রাখুন।`
 
-- **This is not forced alignment.** Edge word boundaries are associated with the online speech synthesizer, not independently verified against the final MP3 waveform. Audio mixing, frame rounding, punctuation, and provider text tokenization can introduce slight mismatches.
-- WordBoundary events may not match whitespace-split Bangla words. In that case timings are estimated and the status is labeled accordingly.
-- User-supplied scripts are sent to remote Edge TTS or gTTS services only if AI voice is used. They are unofficial/free integrations with no guarantee of service availability, commercial license or uptime. Check licensing before business posting.
-- Short captions are limited to 140 words / 50 words in one scene to reduce large sprite rendering. For longer scripts use **Classic Full-Scene Subtitles**.
-- Voice Off uses estimated timing over scene durations; it does not mean the words are being spoken.
-- Full Windows application end-to-end export with online TTS could not be tested in this environment. A synthetic FFmpeg smoke test verified dynamic sprite crop changes at word timestamps.
-- Everything besides optional AI voice synthesis and supplied background media stays local; the development server binds to 127.0.0.1. Never expose the server on the public internet.
+The video should now be near the spoken narration length plus ~1 second of small scene gaps/end hold. Its exact seconds depend on the selected TTS voice and speed. It must **not** stretch to 30 seconds in Auto mode.
+
+## Other features retained
+V4.3 Short Captions + Word Highlight, Edge WordBoundary (estimated when unavailable), Classic Subtitles, 2.5D presenter, Smart Focus, minimal animation, background media, music, export checks, and HD/Full HD MP4.
+
+## Testing notes
+- Checked relevant client-side JavaScript syntax and presence of per-mode duration handling in voice generation, preview, and MP4 export.
+- A full remote Windows FFmpeg + Edge TTS end-to-end test is **not possible here**; please check the output locally and send the error text if your test fails.
+- Edge TTS and Google backup involve online speech services; commercial use is subject to provider terms.
