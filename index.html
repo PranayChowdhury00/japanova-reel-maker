@@ -85,6 +85,9 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 .studio-panel .help-content{padding:10px 12px;line-height:1.55}
 
 /* Minimal brand-first header, responsive bottom mobile navigation */
+/* Keep the company bar visible while scrolling on desktop and mobile. */
+.brand-header{position:sticky!important;top:0;z-index:100!important;width:100%}
+
 .brand-header{background:#fff!important;border-bottom:1px solid #e3e9f2;color:#19304d;padding:0 18px!important;box-shadow:0 3px 14px #20395708}
 .header-inner{max-width:1240px;margin:auto;display:flex;align-items:center;gap:10px;height:66px}
 .brand-mark{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:#d83254;color:#fff;font-size:23px;font-weight:900}
