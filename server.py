@@ -15,7 +15,8 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
     durations=settings['durations']; count=int(settings['count'])
     transitions=settings['transitions']
     if not 1<=count<=20 or len(durations)!=count or len(transitions)!=count: raise ValueError('Invalid scenes')
-    if any(not isinstance(d,(float,int)) or d<=0 or d>30 for d in durations) or abs(sum(durations)-30)>.02: raise ValueError('Invalid scene durations')
+    total_seconds=sum(durations)
+    if any(not isinstance(d,(float,int)) or d<=0 or d>30 for d in durations) or not .5<=total_seconds<=30.02: raise ValueError('Invalid scene durations')
     if any(t not in TRANSITIONS for t in transitions): raise ValueError('Invalid transition')
     ff=shutil.which('ffmpeg')
     if not ff: raise RuntimeError('FFmpeg missing; install then restart START.bat')
@@ -208,12 +209,12 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         if music:
             filters.append(f'[{audio}:a]aresample=44100,volume=0.20[music]')
             filters.append('[music][voiceSide]sidechaincompress=threshold=0.015:ratio=8:attack=40:release=350[ducked]')
-            filters.append('[ducked][voiceMain]amix=inputs=2:duration=first:normalize=0,apad=whole_dur=30,atrim=0:30[aout]')
+            filters.append(f'[ducked][voiceMain]amix=inputs=2:duration=first:normalize=0,apad=whole_dur={total_seconds:.6f},atrim=0:{total_seconds:.6f}[aout]')
         else:
-            filters.append('[voiceMain]apad=whole_dur=30,atrim=0:30[aout]')
+            filters.append(f'[voiceMain]apad=whole_dur={total_seconds:.6f},atrim=0:{total_seconds:.6f}[aout]')
     else:
-        filters.append(f'[{audio}:a]volume=0.35,atrim=0:30[aout]')
-    cmd+=['-filter_complex_threads','2','-filter_complex',';'.join(filters),'-map',f'[{previous}]','-map','[aout]','-t','30','-r',str(fps),'-c:v','libx264','-threads','2','-preset','veryfast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart',str(p/'reel.mp4')]
+        filters.append(f'[{audio}:a]volume=0.35,atrim=0:{total_seconds:.6f}[aout]')
+    cmd+=['-filter_complex_threads','2','-filter_complex',';'.join(filters),'-map',f'[{previous}]','-map','[aout]','-t',f'{total_seconds:.6f}','-r',str(fps),'-c:v','libx264','-threads','2','-preset','veryfast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart',str(p/'reel.mp4')]
     return cmd
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -244,7 +245,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<32000:raise ValueError('Invalid voice request size')
                 request=json.loads(self.rfile.read(size))
-                result=make_voice(request['scenes'],request['voice'],float(request['speed']))
+                result=make_voice(request['scenes'],request['voice'],float(request['speed']),request.get('duration_mode','auto'))
                 payload=json.dumps(result).encode('utf8')
                 self.send_response(200)
                 self.send_header('Content-Type','application/json; charset=utf-8')
