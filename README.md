@@ -1,19 +1,19 @@
-# Japanova Reel Maker V4.2 — Minimal Cinematic Focus
+# Japanova Reel Maker V4.3 — Professional Subtitle & Stability
 
-V4.2 improves the V4.1 motion graphics so that visual aids help explain key moments without making a 30-second education reel busy or childish.
+A local Windows reel maker for 30-second Bengali/English social videos. It retains V4.2's optional 2.5D formal boy/girl presenter, restrained context-aware motion graphics, AI narration, music, background media, and HD/Full HD export.
 
-## What's new
-- **Auto Presenter Shrink:** during a focus moment, the 2.5D boy/girl presenter smoothly shrinks to 75% and moves to the opposite side of the featured object; smoothly returns afterward.
-- **Context-aware selection (heuristic, no additional AI API):** select high-priority COE, financial proof, passport, visa, university and language contexts. The generic word *Japan/জাপান* no longer creates an airplane unless the phrase actually involves travel.
-- **No duplicate object topic:** one complete focus card per topic across the reel.
-- **Limited visual moments:** up to 3 focus moments in a 30-second reel, with at least about 3.8 seconds between their start times.
-- **Professional icon artwork:** locally drawn vector-inspired document, passport, financial proof, graduation, book, and travel icons replace OS-specific emoji cards.
-- **Softer motion default:** Soft Fade & Zoom (default), Gentle Slide, or Subtle Float. No flashing / spinning / repeated bounce by default.
-- **Preview AND exported MP4** include the same general focus layout. FFmpeg uses per-frame avatar scale with focus-in and focus-out transitions.
-- Existing AI voices, scene subtitles, branding, videos/music, HD & Full HD MP4, and Presenter Off remain available.
+## New in V4.3
 
-## Windows update
-Stop the previous START.bat console, open PowerShell:
+- **Short Captions + Word Highlight (default):** shows groups of up to four words and highlights the current word.
+- **Timing-aware:** when Edge TTS returns WordBoundary events, the app uses their positions for word highlighting. If the provider supplies no usable boundaries (including Google Translate TTS backup) or narration is Off, word timing is **estimated**, not speech-recognition-accurate. The voice status reports which timing mode was used.
+- **Classic Subtitle Mode:** the prior entire-scene subtitle remains selectable. Subtitles can be turned Off.
+- **Local subtitle rendering:** browser Canvas renders caption sprites with matching font and color styles. FFmpeg crops the appropriate sprite row for each word at export, reducing the number of video inputs compared with one PNG per word.
+- **Export validation:** checks for empty/oversized scenes, scripts over 2,500 characters, short subtitle projects over 140 words, assets not loaded, and unusually large uploads (200 MB per media file).
+- **Backward-compatible V4.2 features:** Full HD/Lite output, boy/girl presenter, scene transitions, Smart Focus animations, optional music, AI voice, and scene subtitles.
+
+## Update on Windows
+
+Stop the old app before updating:
 
 ```powershell
 cd C:\Users\USER\japanova-reel-maker
@@ -21,23 +21,21 @@ git pull origin main
 .\START.bat
 ```
 
-In the browser press **Ctrl+Shift+R**, then select **Smart Objects: On — Smart Focus (max 3)** and **Soft Fade & Zoom**. For your first test choose **HD 720p** (not 1080p), then generate voice, preview and export.
+Press **Ctrl + Shift + R** in the browser. Choose **HD 720p** for your first test.
 
-### Example script
-`জাপানে পড়াশোনা করতে চান? COE প্রস্তুত রাখতে হবে। পাসপোর্ট ও ভিসার তথ্য মিলিয়ে নিন। ব্যাংক স্টেটমেন্ট ঠিক রাখুন। জাপানে গিয়ে ভাষা শেখা চালিয়ে যান।`
+### Test
+1. Choose **Short Captions + Word Highlight**, Formal Boy, and Smart Focus On.
+2. Use a brief script such as: `জাপানে পড়াশোনা করতে চাইলে আগে COE প্রস্তুত করুন। পাসপোর্ট আর ব্যাংক স্টেটমেন্ট ঠিক রাখুন।`
+3. Click **Generate & Listen Voice**. Look at the status message to see if timing is Edge WordBoundary or estimated.
+4. Click **Live Preview** and then **Export 30s MP4**. Check word highlight changes in the exported file.
+5. If export fails, send the exact error from the status box or PowerShell window.
 
-Expected: COE or financial proof and other distinct relevant objects may be shown, no generic airplane just because Japan is mentioned, no category repeated.
+## Technical notes / limits
 
-## Important limitations
-- **This is a heuristic, not a general-purpose AI vision or semantic model.** Context detection uses Bengali/English phrase patterns and ranked priorities; some matches will be imperfect.
-- **Timing is still scene-level**, not exactly at the time the presenter says each word. Precise alignment would require word timestamp data.
-- The presenter remains a stylized **2.5D**, not a rigged 3D person. Mouth animation is energy-driven, not phoneme-correct.
-- Focus resizing is approximately smooth in preview and rendered FFmpeg; minor timing/opacity differences may remain. Render cost grows with the number of overlay layers.
-- Tested: JavaScript parses, six keyword patterns match, dynamic FFmpeg avatar scale and object opacity render a synthetic H.264/AAC MP4. **Full end-to-end Windows UI export has not yet been tested here.**
-- No paid animation API. AI voice optionally sends script text online via unofficial Edge TTS, or backup gTTS. Internet availability, reliability and commercial licensing are not guaranteed.
-- Keep the local server bound to localhost (127.0.0.1), not public Internet.
-
-## Research-based design rationale
-- Nielsen Norman Group: purposeful restrained motion is more useful than excessive animation: https://www.nngroup.com/articles/animation-purpose-ux/
-- University of West Florida: avoid rapid flashing or unnecessary motion in social media videos: https://uwf.edu/brand/social-media/social-media-videos-best-practices/
-- Clemson: stick to consistent motion types and gentle fade/slide/zoom styles: https://www.clemson.edu/brand/imagery/videography.html
+- **This is not forced alignment.** Edge word boundaries are associated with the online speech synthesizer, not independently verified against the final MP3 waveform. Audio mixing, frame rounding, punctuation, and provider text tokenization can introduce slight mismatches.
+- WordBoundary events may not match whitespace-split Bangla words. In that case timings are estimated and the status is labeled accordingly.
+- User-supplied scripts are sent to remote Edge TTS or gTTS services only if AI voice is used. They are unofficial/free integrations with no guarantee of service availability, commercial license or uptime. Check licensing before business posting.
+- Short captions are limited to 140 words / 50 words in one scene to reduce large sprite rendering. For longer scripts use **Classic Full-Scene Subtitles**.
+- Voice Off uses estimated timing over scene durations; it does not mean the words are being spoken.
+- Full Windows application end-to-end export with online TTS could not be tested in this environment. A synthetic FFmpeg smoke test verified dynamic sprite crop changes at word timestamps.
+- Everything besides optional AI voice synthesis and supplied background media stays local; the development server binds to 127.0.0.1. Never expose the server on the public internet.
