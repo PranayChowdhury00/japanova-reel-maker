@@ -44,24 +44,24 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         cmd+=['-loop','1','-framerate',str(fps),'-i',str(path)]
     avatar_index=first+count+subtitle_count
     motion_items=settings.get('motion_items',[])
-    if not isinstance(motion_items,list) or len(motion_items)>6:raise ValueError('Too many motion graphics')
+    if not isinstance(motion_items,list) or len(motion_items)>3:raise ValueError('Too many focus moments')
     motion_style=settings.get('motion_style','bounce')
-    if motion_style not in ('bounce','slide','float'):raise ValueError('Invalid motion style')
+    if motion_style not in ('fade','slide','float'):raise ValueError('Invalid motion style')
     motion_position=settings.get('motion_position','right')
     if motion_position not in ('left','right','top'):raise ValueError('Invalid motion position')
     size=settings.get('motion_size',100)
     if not isinstance(size,(int,float)) or not 65<=size<=120:raise ValueError('Invalid motion size')
-    allowed={'coe','passport','visa','bank','university','japan'}
-    used=set()
+    allowed={'coe','passport','visa','bank','university','language','japan'}
+    used=set();used_categories=set()
     scene_starts=[];cursor=0.
     for d in durations:scene_starts.append(cursor);cursor+=d
     for item in motion_items:
         if not isinstance(item,dict):raise ValueError('Invalid motion item')
         scene=item.get('scene');ident=item.get('id')
-        if not isinstance(scene,int) or not 0<=scene<count or scene in used or ident not in allowed:raise ValueError('Invalid motion keyword')
-        used.add(scene)
+        if not isinstance(scene,int) or not 0<=scene<count or scene in used or ident not in allowed or ident in used_categories:raise ValueError('Invalid or repeated focus topic')
+        used.add(scene);used_categories.add(ident)
         start=float(item.get('start',-1));length=float(item.get('duration',-1))
-        if not (scene_starts[scene]-.05<=start<=scene_starts[scene]+durations[scene] and .05<=length<=2.3 and start+length<=scene_starts[scene]+durations[scene]+.05):
+        if not (scene_starts[scene]-.05<=start<=scene_starts[scene]+durations[scene] and .05<=length<=2.6 and start+length<=scene_starts[scene]+durations[scene]+.05):
             raise ValueError('Motion timing must fit its scene')
         path=p/f'motion{scene}.png'
         if not path.is_file():raise ValueError('Missing motion image')
@@ -90,42 +90,68 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         filters.append(f'[{previous}][txt{i}]overlay=x={x}:y={y}:shortest=0:eof_action=pass:format=auto[compose{i}]')
         previous=f'compose{i}';start=end
     if avatar_count:
-        # Relative geometry keeps presenter consistent at Lite / HD / Full HD.
+        # Animate the presenter from 100% to 75% size during important
+        # object moments. The FFmpeg scale filter evaluates every frame.
         aw=max(2,round(w*600/1080/2)*2)
         ah=max(2,round(h*850/1920/2)*2)
         ax={'left':round(w*.01),'center':round((w-aw)/2),'right':round(w-aw-w*.01)}[position]
         ay=round(h*420/1920)
+        target_x=round(w*(.55 if motion_position=='left' else .074))
+        target_y=round(h*540/1920)
+        def ff_focus(clock):
+            fragments=[]
+            for item in motion_items:
+                st=float(item['start']);en=st+float(item['duration'])
+                fragments.append(
+                    f'min(1,min(max(0,({clock}-{st-.4:.5f})/.4),'
+                    f'max(0,({en+.4:.5f}-{clock})/.4)))'
+                )
+            if not fragments:return '0'
+            result=fragments[0]
+            for frag in fragments[1:]:result=f'max({result},{frag})'
+            return result
+        def escaped(expr):
+            return expr.replace(',',r'\\,')
+        frame_focus=escaped(ff_focus(f'n/{fps}'))
+        time_focus=escaped(ff_focus('t'))
         for j,pose in enumerate(('closed','open','blink')):
-            filters.append(f'[{avatar_index+j}:v]scale={aw}:{ah},format=rgba[avatar{j}]')
-        filters.append(f'[{previous}][avatar0]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass[body]')
+            avatar_stream=avatar_index+j
+            avatar_w=f'trunc({aw}*(1-0.25*({frame_focus}))/2)*2'
+            avatar_h=f'trunc({ah}*(1-0.25*({frame_focus}))/2)*2'
+            filters.append(f'[{avatar_stream}:v]scale=w={avatar_w}:h={avatar_h}:eval=frame,format=rgba[avatar{j}]')
+        # Existing position and mouth/blink streams remain synchronous.
+        xpos=f'{ax}+({target_x-ax})*({time_focus})'
+        ypos=f'{ay}+({target_y-ay})*({time_focus})'
+        filters.append(f'[{previous}][avatar0]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass[body]')
         previous='body'
-        # Voice-energy-derived mouth activity, sampled from the generated voice track.
         intervals=mouth_intervals(p/'voice.mp3' if has_voice else None)
         if intervals:
             expression=open_expression(intervals)
-            filters.append(f'[{previous}][avatar1]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass:enable={expression}[speaking]')
+            filters.append(f'[{previous}][avatar1]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable={expression}[speaking]')
             previous='speaking'
         blink='+'.join(f'between(t\\,{float(v):.2f}\\,{float(v)+.12:.2f})' for v in (2.8,6.9,11.4,16.1,20.9,26.3))
-        filters.append(f'[{previous}][avatar2]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass:enable={blink}[blinking]')
+        filters.append(f'[{previous}][avatar2]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable={blink}[blinking]')
         previous='blinking'
     if motion_items:
-        motion_width=max(2,round(w*(280/1080)*(size/100)/2)*2)
-        motion_height=max(2,round(h*(280/1920)*(size/100)/2)*2)
-        mx={'left':round(w*45/1080),'right':round(w-35*w/1080-motion_width),'top':round(w-65*w/1080-motion_width)}[motion_position]
-        my=round(h*(295 if motion_position=='top' else 720)/1920)
+        motion_width=max(2,round(w*(350/1080)*(size/100)/2)*2)
+        motion_height=max(2,round(h*(350/1920)*(size/100)/2)*2)
+        mx={'left':round(w*65/1080),'right':round(w*(1-65/1080)-motion_width),'top':round(w*(1-65/1080)-motion_width)}[motion_position]
+        my=round(h*(385 if motion_position=='top' else 720)/1920)
         for j,item in enumerate(motion_items):
             start=float(item['start']);finish=start+float(item['duration'])
             position_x=str(mx);position_y=str(my)
             if motion_style=='slide':
-                dist=-round(w*.18) if motion_position=='left' else round(w*.18)
-                position_x=f'if(lt(t\\,{start+.35:.5f})\\,{mx}+{dist}*(1-(t-{start:.5f})/.35)\\,{mx})'
-            elif motion_style=='bounce':
-                position_y=f'{my}-if(lt(t\\,{start+.5:.5f})\\,45*sin(3.14159265*(t-{start:.5f})/.5)\\,0)'
+                distance=-round(w*.06) if motion_position=='left' else round(w*.06)
+                position_x=f'if(lt(t\\,{start+.4:.5f})\\,{mx}+{distance}*(1-(t-{start:.5f})/.4)\\,{mx})'
             elif motion_style=='float':
-                position_y=f'{my}+{max(2,round(h*.007))}*sin(5*(t-{start:.5f}))'
+                position_y=f'{my}+{max(2,round(h*.004))}*sin(2.5*(t-{start:.5f}))'
             label=f'motionout{j}'
-            filters.append(f'[{motion_index+j}:v]scale={motion_width}:{motion_height},format=rgba[motionasset{j}]')
-            filters.append(f'[{previous}][motionasset{j}]overlay=x={position_x}:y={position_y}:shortest=0:eof_action=pass:enable=between(t\\,{start:.5f}\\,{finish:.5f})[{label}]')
+            fade_d=min(.4,float(item['duration'])/3)
+            filters.append(f'[{motion_index+j}:v]scale={motion_width}:{motion_height},format=rgba,'
+                           f'fade=t=in:st={start:.5f}:d={fade_d:.4f}:alpha=1,'
+                           f'fade=t=out:st={finish-fade_d:.5f}:d={fade_d:.4f}:alpha=1[motionasset{j}]')
+            filters.append(f'[{previous}][motionasset{j}]overlay=x={position_x}:y={position_y}:'
+                           f'shortest=0:eof_action=pass:enable=between(t\\,{start:.5f}\\,{finish:.5f})[{label}]')
             previous=label
     if subtitle_count:
         start=0.
@@ -224,5 +250,5 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__=='__main__':
     s=http.server.ThreadingHTTPServer(('127.0.0.1',8765),Handler)
     threading.Timer(.5,lambda:webbrowser.open('http://127.0.0.1:8765')).start()
-    print('Japanova Reel Maker V4.1: http://127.0.0.1:8765')
+    print('Japanova Reel Maker V4.2: http://127.0.0.1:8765')
     s.serve_forever()
