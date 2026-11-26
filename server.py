@@ -25,7 +25,13 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
     cmd+=['-loop','1','-framerate',str(fps),'-i',str(p/'base.png')]
     first=base+1
     for i in range(count):cmd+=['-loop','1','-framerate',str(fps),'-i',str(p/f'scene{i}.png')]
-    audio=first+count
+    subtitle_count=count if settings.get('subtitles',False) else 0
+    if not isinstance(settings.get('subtitles',False),bool): raise ValueError('Invalid subtitle flag')
+    for i in range(subtitle_count):
+        path=p/f'subtitle{i}.png'
+        if not path.is_file(): raise ValueError(f'Missing subtitle image {i}')
+        cmd+=['-loop','1','-framerate',str(fps),'-i',str(path)]
+    audio=first+count+subtitle_count
     cmd+=['-stream_loop','-1','-i',str(p/'music')] if music else ['-f','lavfi','-i','anullsrc=r=44100:cl=stereo']
     voice_index=None
     if has_voice:
@@ -47,6 +53,20 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
             y=f'if(lt(t\\,{start+.5:.6f})\\,max(0\\,H*(1-(t-{start:.6f})/0.5))\\,0)'
         filters.append(f'[{previous}][txt{i}]overlay=x={x}:y={y}:shortest=0:eof_action=pass:format=auto[compose{i}]')
         previous=f'compose{i}';start=end
+    if subtitle_count:
+        start=0.
+        for i,duration in enumerate(durations):
+            end=start+duration
+            label=f'caption{i}'
+            # Enable each transparent caption only during its scene;
+            # overlays are looped so they don't expire mid-video.
+            filters.append(
+                f'[{previous}][{first+count+i}:v]'
+                f'overlay=x=0:y=0:shortest=0:eof_action=pass:'
+                f'enable=between(t\\,{start:.6f}\\,{end:.6f})[{label}]'
+            )
+            previous=label
+            start=end
     if has_voice:
         filters.append(f'[{voice_index}:a]aresample=44100,volume=1.0,asplit=2[voiceSide][voiceMain]' if music else f'[{voice_index}:a]aresample=44100,volume=1.0[voiceMain]')
         if music:
@@ -93,8 +113,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     key=part.get_param('name',header='content-disposition')
                     data=part.get_payload(decode=True)
                     if key=='settings':settings=json.loads(data)
-                    elif key in ('base','media','music','voice') or (key and key.startswith('scene') and key[5:].isdigit()):
-                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'{key}.png' if key.startswith('scene') else key
+                    elif key in ('base','media','music','voice') or (key and (key.startswith('scene') and key[5:].isdigit() or key.startswith('subtitle') and key[8:].isdigit())):
+                        name='base.png' if key=='base' else 'voice.mp3' if key=='voice' else f'{key}.png' if key.startswith(('scene','subtitle')) else key
                         (p/name).write_bytes(data)
                         if key=='media':media=True;still=part.get_content_type().startswith('image/')
                         if key=='music':music=True
@@ -116,5 +136,5 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__=='__main__':
     s=http.server.ThreadingHTTPServer(('127.0.0.1',8765),Handler)
     threading.Timer(.5,lambda:webbrowser.open('http://127.0.0.1:8765')).start()
-    print('Japanova Reel Maker V3.3: http://127.0.0.1:8765')
+    print('Japanova Reel Maker V3.4: http://127.0.0.1:8765')
     s.serve_forever()
