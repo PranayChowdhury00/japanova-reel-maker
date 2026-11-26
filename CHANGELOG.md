@@ -36,3 +36,12 @@
 - Hard-capped motion overlays at one per scene and six per reel to reduce visual clutter and CPU load.
 - No paid API needed. Object timing is approximate at scene level, not word-accurate.
 - FFmpeg animation expressions passed synthetic 2-second H.264/AAC smoke tests; full Windows flow remains to be verified.
+
+## V4.2 — Minimal Cinematic Focus (2026-11-26)
+- Replaced repeated emoji pop-ups with consistent illustrated objects and restrained motion.
+- Presenter smoothly shrinks to 75% and shifts aside during focus moments, then returns.
+- Added context-sensitive topic selection, max three focus moments, one display per unique topic, and 3.8-second spacing.
+- Default motion changed to soft fade and zoom; gentle slide and float remain optional.
+- Generic Japan keyword no longer automatically produces airplane; travel context required.
+- Integrated FFmpeg dynamic scaling/positioning and alpha fade with animated focus objects.
+- Smoke-tested FFmpeg dynamic scaling and combined H.264/AAC 5-second synthetic render. Full Windows end-to-end remains unverified.
