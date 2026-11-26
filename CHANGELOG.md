@@ -45,3 +45,11 @@
 - Generic Japan keyword no longer automatically produces airplane; travel context required.
 - Integrated FFmpeg dynamic scaling/positioning and alpha fade with animated focus objects.
 - Smoke-tested FFmpeg dynamic scaling and combined H.264/AAC 5-second synthetic render. Full Windows end-to-end remains unverified.
+
+## V4.3 — Professional Subtitle & Stability (2026-11-26)
+- Added default 3–4-word grouped subtitles with highlighted current word; classic full-scene subtitles and Off remain available.
+- Captured Edge TTS WordBoundary timestamp metadata; estimates timing when metadata mismatches or backup Google TTS is used.
+- Added one vertical PNG subtitle sprite per scene and per-frame FFmpeg crop selection to limit stream count.
+- Added export preflight checks for empty/long scenes, total script words, missing presenter assets, and large background files.
+- Synthetic FFmpeg test confirmed correct row selection and playable H.264/AAC output.
+- Full online voice + Windows UI end-to-end test remains unverified.
