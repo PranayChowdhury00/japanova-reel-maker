@@ -55,7 +55,7 @@ async function ensureVoice(){
   voiceURL=URL.createObjectURL(voiceData);voiceSignature=sig;
   durations=data.durations.map(d=>Number(d));
   editor();$('voiceAudio').src=voiceURL;$('voiceAudio').style.display='block';
-  $('status').textContent=`Voice তৈরি! ${data.spoken_seconds}s narration, 30s reel. Scene timing synchronized.`;
+  $('status').textContent=`Voice তৈরি! ${data.spoken_seconds}s narration, 30s reel. Provider: ${data.provider || 'Edge TTS'}. ${data.notice || ''}`;
   return voiceData;
  }finally{voiceBusy=false}
 }
