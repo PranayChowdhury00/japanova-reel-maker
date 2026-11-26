@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: japanova-reel-maker
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: CLOUD_LITE
+        value: "1"
+      - key: APP_PASSWORD
+        sync: false
