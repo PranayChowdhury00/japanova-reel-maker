@@ -1,37 +1,45 @@
-# Japanova Reel Maker V4.0 — AI Presenter Studio
+# Japanova Reel Maker V4.1 — Smart Motion Graphics Studio
 
-**V4.0 (preview release)** adds an optional 2.5D illustrated presenter to the existing local Windows reel editor. This is deliberately **not** a rigged 3D human or true phoneme-based lip-sync model.
+A local-first Windows app for Bengali/English 30-second social media reels.
 
-### Features
-- Select **Formal Boy**, **Formal Girl**, or **Off (Classic Text Reel)**.
-- Presenter position: left, center, or right.
-- Eyes blink automatically during previews and final MP4 output.
-- During exports with AI voice narration, mouth-open intervals are estimated from speech amplitude (RMS), not from consonants/vowels. This is approximate audio-reactive speaking animation.
-- 30-second H.264 MP4 retains optional Bengali/English voice, background music, subtitles, images/video, and previous brand styling.
-- No new paid API or heavy 3D graphics engine. Presenter SVG portraits render in the browser and are exported as PNG poses; FFmpeg composites them into video.
-- The previous 3.4 text-only workflow remains available by setting Presenter = Off.
+## V4.1: Keyword-based animated objects
+Select **Smart Objects: On — Auto Detect** to add an illustrated emoji card when a scene contains a matching topic:
 
-### Update on Windows
-Stop the running app, then open PowerShell:
+| Script keywords (examples) | Animated card |
+| --- | --- |
+| COE, সিওই | 📑 COE documents |
+| Passport, পাসপোর্ট | 🛂 PASSPORT |
+| Visa, ভিসা | 🛃 VISA |
+| Bank, ব্যাংক, ব্যালেন্স, Statement | 💳 BANK |
+| University, বিশ্ববিদ্যালয়, স্কুল | 🎓 UNIVERSITY |
+| Japan, জাপান | ✈️ JAPAN |
+
+Choose one of **Pop & Bounce**, **Slide In/Out**, or **Floating**, adjust **Left / Right / Top** position, and set card size to 65–120%. Preview and final FFmpeg MP4 both include animation. There is no extra paid API or asset download.
+
+**Timing limitations:** keyword matching is textual, not AI semantic understanding. One card is shown for each matching scene, up to six cards per reel. The object begins early in its scene, not exactly at the spoken word, because the voice engine has scene-level rather than word-level timestamps. For clarity, the card is placed above the subtitle safe area. Cards are rendered from browser canvas graphics and OS emoji fonts, so appearance may vary by Windows version.
+
+## Existing features
+- Optional 2.5D Boy / Girl Presenter (or Off), mouth energy animation, blinking.
+- Bengali Male / Female AI narration, optional English voices; free online Edge TTS with Google TTS fallback.
+- Automatic subtitles (scene-level sync), styling, transitions, branded backgrounds, background video/music.
+- Local FFmpeg CPU export to Lite 540p, HD 720p and Full HD 1080p 30-second MP4.
+
+## Update on Windows
+Stop the running app first. Open PowerShell:
 
 ```powershell
 cd C:\Users\USER\japanova-reel-maker
 git pull origin main
 .\START.bat
 ```
-Refresh the browser with **Ctrl+Shift+R**.
 
-### Recommended first test
-1. Choose **Formal Boy**, **HD 720p**, subtitle **On**, and a short Bengali script.
-2. Click **Generate & Listen Voice**, then **Live Preview**.
-3. Click **Export 30s MP4**. Rendering will be CPU-intensive, especially at 1080p. Close other heavy apps.
-4. Check the downloaded video for mouth movement, blink, narration and subtitles. Send back any error from the terminal or interface.
+Hard-refresh browser with Ctrl+Shift+R. In the app set **Smart Objects** to On, paste a short sample:
+`জাপানে যাওয়ার আগে COE প্রস্তুত রাখুন। পাসপোর্ট ও ভিসার কাগজ যাচাই করুন। ব্যাংক স্টেটমেন্ট ঠিক রাখুন।`
+Click **Auto Split Sentences**, then **Generate & Listen Voice** and **Live Preview** before **Export 30s MP4**.
 
-### Limits and safeguards
-- **Beta:** The synthetic FFmpeg overlay technique was tested, but the complete Windows end-to-end flow has not been verified remotely.
-- Speech-energy mouth activity is an approximation; it is **not** word-perfect lip sync.
-- This is a stylized 2.5D presenter, **not full 3D**. It has a static upper body, blinking, mouth poses; no hand animation.
-- Avatar is SVG/Canvas-based and needs no additional model downloads or paid GPU API. It can take longer to render than V3.4.
-- Edge TTS and backup gTTS require internet. Edge is an unofficial Microsoft client. Check commercial licensing terms before publishing reels.
-- All video composition is local. Text is sent to online TTS providers only when AI voice is enabled.
-- The default server binds only to 127.0.0.1; do not expose it publicly.
+## Stability and privacy
+- This is an early V4.1 build. JavaScript syntax and separate FFmpeg animation expressions were tested. Full Windows end-to-end export on the user's PC remains unverified.
+- Export rendering can be slower with a presenter, subtitles and six graphic overlays at once; start with HD 720p.
+- The CPU-first design avoids a heavy 3D graphics model. Characters are *2.5D stylized*, and mouth movement is not phoneme-accurate.
+- No extra service is required for keyword graphics. AI voice still sends entered script to online services (Edge TTS / backup gTTS), whose availability and commercial terms are not guaranteed.
+- The app binds to 127.0.0.1. Never expose the local server on a public address.
