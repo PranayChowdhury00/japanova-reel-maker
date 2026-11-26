@@ -83,7 +83,7 @@ function subtitle(i){
  ctx.restore();
 }
 const motionKeywords=[
- {id:'coe',label:'COE',emoji:'📑',pattern:/\\bCOE\\b|সিওই|যোগ্যতার সনদ|এলিজিবিলিটি/i},
+ {id:'coe',label:'COE',emoji:'📑',pattern:/\bCOE\b|সিওই|যোগ্যতার সনদ|এলিজিবিলিটি/i},
  {id:'passport',label:'PASSPORT',emoji:'🛂',pattern:/passport|পাসপোর্ট/i},
  {id:'visa',label:'VISA',emoji:'🛃',pattern:/visa|ভিসা/i},
  {id:'bank',label:'BANK',emoji:'💳',pattern:/bank|ব্যাংক|ব্যালেন্স|statement|স্টেটমেন্ট|আর্থিক/i},
@@ -104,6 +104,7 @@ function motionPosition(size){
  const pos=$('motionPosition').value;
  return {x:pos==='left'?45:pos==='top'?W-size-65:W-size-35,y:pos==='top'?295:720};
 }
+const motionCanvasCache=new Map();
 function drawMotionCard(item,target=ctx){
  const width=280,height=280;
  target.clearRect(0,0,width,height);
@@ -127,7 +128,7 @@ function motionPreview(t){
  if(style==='bounce'){y-=Math.sin(Math.min(1,elapsed/.48)*Math.PI)*50;scale=.72+.28*ease}
  if(style==='slide')x+=(1-ease)*($('motionPosition').value==='left'?-200:200);
  if(style==='float')y+=Math.sin(elapsed*5)*14;
- const tmp=document.createElement('canvas');tmp.width=280;tmp.height=280;drawMotionCard(item,tmp.getContext('2d'));
+ let tmp=motionCanvasCache.get(item.id);if(!tmp){tmp=document.createElement('canvas');tmp.width=280;tmp.height=280;drawMotionCard(item,tmp.getContext('2d'));motionCanvasCache.set(item.id,tmp)}
  ctx.save();ctx.globalAlpha=alpha;ctx.translate(x+size/2,y+size/2);ctx.scale(scale,scale);ctx.drawImage(tmp,-size/2,-size/2,size,size);ctx.restore();
 }
 async function motionBlob(item){
