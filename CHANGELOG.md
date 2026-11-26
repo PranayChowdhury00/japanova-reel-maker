@@ -75,3 +75,11 @@
 - Collapsed verbose guidance into seven optional Help accordions.
 - Preserved IDs, rendering logic, project Save/Open, auto-duration and voice pipelines.
 - JavaScript syntax, markup structure and functional ID uniqueness checked; Windows/mobile browser tests pending.
+
+## V4.5.1 — Japanova Brand Header Refinement (2026-11-26)
+- Simplified header to JAPANOVA EDU brand and project Save/Open actions.
+- Removed technical feature labels and redundant Local Studio indicator.
+- Moved the five editing tabs into a mobile bottom navigation bar.
+- Preview shows practical duration and scene count instead of decorative metadata.
+- Normal success messages are hidden; errors and active job notices remain visible.
+- Static JavaScript and ID checks passed; physical device tests pending.
