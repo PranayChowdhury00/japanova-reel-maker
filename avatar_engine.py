@@ -4,7 +4,6 @@ This is a 2.5D character, not a rigged 3D model or phoneme-based lip sync.
 """
 import math
 import pathlib
-import struct
 import subprocess
 import shutil
 
@@ -65,12 +64,6 @@ def presenter_svg(gender='boy',pose='closed'):
 <!-- blazer details -->
 <path d="M109 765 L109 832 M503 765 L503 832" fill="none" stroke="#92a2bc" stroke-width="4" opacity=".3"/>
 </svg>"""
-
-def build_images(folder,gender):
-    try: import cairosvg
-    except ImportError as e: raise RuntimeError('Avatar dependency missing. Run: py -3 -m pip install -r requirements.txt') from e
-    for pose in POSES:
-        cairosvg.svg2png(bytestring=presenter_svg(gender,pose).encode('utf8'),write_to=str(folder/f'avatar-{pose}.png'))
 
 def mouth_intervals(voice_file):
     """Approximate mouth activity by RMS energy, NOT phoneme lip synchronization."""
