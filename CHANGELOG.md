@@ -61,3 +61,10 @@
 - Voice Off mode uses estimated text-length playback; maximum 30 seconds remains enforced.
 - Short text no longer forces an extra ~20 seconds of dead air in Auto mode.
 - Full Windows voice-generation and MP4-export workflow awaits local verification.
+
+## V4.4 — Save & Resume Projects (2026-11-26)
+- Added portable **Save Project (.jrm)** and **Open Project (.jrm)** controls.
+- Archive includes the scene editor state, settings, scene durations and optional embedded original background, music, and previously generated AI narration audio.
+- Reuses cached voice only when settings and script exactly match the saved voice signature.
+- ZIP handling uses Python stdlib with explicit member allowlist, per-file byte limits and project schema validation.
+- Existing animated preview and MP4 export are untouched; full Windows end-to-end tests are still required.
