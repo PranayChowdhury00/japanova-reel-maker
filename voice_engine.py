@@ -27,10 +27,10 @@ def probe_seconds(path):
 
 def clean_speech(text):
     # Remove URL, invisible controls, emoji/symbols that can upset TTS requests.
-    text = re.sub(r'https?://\\S+', '', text)
-    text = ''.join(c for c in text if c.isprintable() or c in '\\n\\t')
-    text = re.sub(r'[\\U0001F000-\\U0010FFFF]', '', text)
-    text = re.sub(r'\\s+', ' ', text).strip()
+    text = re.sub(r'https?://\S+', '', text)
+    text = ''.join(c for c in text if c.isprintable() or c in '\n\t')
+    text = re.sub(r'[\U0001F000-\U0010FFFF]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
 async def edge_generate(scenes, voice, speed, folder):
