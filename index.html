@@ -1,8 +1,12 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.3.1</title>
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.4</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eff2f8;color:#15233b;font:15px system-ui,'Nirmala UI',sans-serif}header{background:linear-gradient(110deg,#111f39,#263d67);padding:20px max(20px,calc((100% - 1260px)/2));color:#fff;display:flex;justify-content:space-between;align-items:center}header b{font-size:20px}header small{color:#bbcae5}main{max-width:1260px;margin:25px auto;display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:22px;padding:0 18px}section{background:#fff;border:1px solid #dce3ef;border-radius:18px;padding:24px;box-shadow:0 8px 30px #10233b0a}h1{font-size:23px;margin:0 0 5px}h2{font-size:18px;margin:28px 0 10px}p{line-height:1.5}small{color:#61718c}label{display:block;font-weight:700;margin:14px 0 6px}input,textarea,select,button{font:inherit;width:100%;padding:11px;border:1px solid #cbd5e4;border-radius:9px;background:#fff;color:inherit}textarea{height:138px;resize:vertical}button{background:#df2e4d;color:#fff;border:none;font-weight:750;cursor:pointer;margin:10px 0 0}button:hover{filter:brightness(.96)}button:disabled{opacity:.5;cursor:wait}.secondary{background:#edf2f9;color:#233e64}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene{border:1px solid #d6dfed;background:#f8fafd;padding:14px;border-radius:12px;margin:11px 0}.scene h3{margin:0 0 5px;font-size:14px}.scene textarea{height:76px}.scene .twocol{grid-template-columns:1fr 1fr}.scene label{margin:7px 0 5px;font-size:12px}.tip{background:#eaf1fd;padding:12px 14px;border-radius:10px;color:#38527c;margin:14px 0;font-size:13px}.preview{position:sticky;top:16px;text-align:center;align-self:start}.preview canvas{display:block;margin:12px auto;width:100%;max-width:292px;aspect-ratio:9/16;background:#0c1631;border-radius:15px;box-shadow:0 14px 40px #101e3540}.preview h2{margin:2px 0}progress{width:100%;height:11px;margin-top:14px;accent-color:#e02f50}#download[hidden]{display:none}#download{display:block;text-decoration:none;color:white;background:#187b5e;border-radius:8px;padding:13px;margin-top:10px;font-weight:700}#status{overflow-wrap:anywhere;font-size:13px;color:#254b76}.swatches{display:flex;gap:9px;flex-wrap:wrap}.swatch{width:38px;height:38px;padding:0;border:3px solid #fff;box-shadow:0 0 0 1px #b9c5d5;border-radius:50%;margin:0}.swatch.active{box-shadow:0 0 0 3px #253e62}.chip{background:#e6edf6;border-radius:999px;padding:4px 10px;display:inline-block;font-size:12px;color:#3b5274}@media(max-width:850px){main{grid-template-columns:1fr}.preview{position:static}header{padding:16px}section{padding:16px}}
-</style></head><body><header><div><b>JAPANOVA EDU</b> <span class="chip">Reel Studio V4.3.1</span><div><small>Smart Scene · Color Typography · Motion Effects · AI Voiceover · MP4</small></div></div><b>🇯🇵</b></header>
+</style></head><body><header><div><b>JAPANOVA EDU</b> <span class="chip">Reel Studio V4.4</span><div><small>Smart Scene · Color Typography · Motion Effects · AI Voiceover · MP4</small></div></div><b>🇯🇵</b></header>
 <main><section><h1>স্ক্রিপ্ট অনুযায়ী সুন্দর রিল তৈরি করুন</h1><small>আগের V3.1-এর ফিচারের সঙ্গে নতুন Text Style ও Transition</small>
+<h2>Project Manager <span class="chip">Save &amp; Resume</span></h2>
+<div class="twocol"><button id="saveProject" type="button" class="secondary">💾 Save Project (.jrm)</button><button id="openProject" type="button" class="secondary">📂 Open Project (.jrm)</button></div>
+<input id="projectFile" type="file" accept=".jrm,application/octet-stream" hidden>
+<div class="tip">Project File-এ Scenes, Settings, Background, Music এবং তৈরি করা Voice সেভ হবে। সর্বোচ্চ প্রতিটি Asset 80MB। বড় Video থাকলে আগে Compress করুন। এই ফাইল নিজের PC-তে রাখুন; Script ও ব্যক্তিগত Media এতে অন্তর্ভুক্ত থাকবে।</div>
 <label for="script">স্ক্রিপ্ট (বাংলা/English)</label><textarea id="script">জাপানে উচ্চশিক্ষার স্বপ্ন দেখছেন? এখন থেকেই জাপানি ভাষা শেখা শুরু করুন। COE ও ভিসার প্রয়োজনীয় ডকুমেন্ট প্রস্তুত রাখুন। নিয়মিত ভাষা অনুশীলন করুন। বিস্তারিত জানতে Japanova Edu ফলো করুন।</textarea>
 <div class="twocol"><div><label for="brand">ব্র্যান্ডের নাম</label><input id="brand" value="JAPANOVA EDU" maxlength="40"></div><div><label for="quality">ভিডিও কোয়ালিটি</label><select id="quality"><option value="lite">Lite 540p</option><option value="hd" selected>HD 720p</option><option value="full">Full HD 1080p</option></select></div></div>
 <div class="twocol"><div><label for="durationMode">Video Duration</label><select id="durationMode"><option value="auto" selected>Auto — Ends with speech</option><option value="fixed30">Fixed 30 Seconds</option></select></div><div class="tip">Auto Mode: Voice-এর প্রকৃত দৈর্ঘ্য + ছোট ending pause। Voice Off হলে লেখা অনুযায়ী আনুমানিক দৈর্ঘ্য।</div></div>
@@ -361,7 +365,101 @@ function checkBeforeExport(){
    if(!img?.complete||!img.naturalWidth)throw Error('Presenter assets are not ready. Refresh the browser.');
  }
 }
-async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems().map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.3.1.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
+
+const PROJECT_SETTINGS=['brand','quality','durationMode','voice','voiceSpeed','avatar','avatarPosition','motionMode','motionStyle','motionPosition','motionSize','subtitleMode','subtitleColor','subtitlePosition','subtitleSize','theme','textPreset','fontWeight','textEffect','transition','fontSize'];
+let projectURL=null;
+function captureProject(){
+ prepare();
+ const settings={};for(const id of PROJECT_SETTINGS)settings[id]=$(id).value;
+ const validScenes=scenes.map(s=>({text:s.text,color:s.color,transition:s.transition}));
+ return {format:'japanova-reel-project',version:1,saved_at:new Date().toISOString(),script:$('script').value,
+         settings,scenes:validScenes,durations:[...durations],
+         narration:voiceData&&voiceSignature===signature()?{signature:voiceSignature,word_timings:wordTimings,timing_source:wordTimingSource}:null};
+}
+async function saveProject(){
+ if(locked)return;
+ $('saveProject').disabled=true;
+ try{
+   const project=captureProject();
+   const fd=new FormData();fd.append('project',new Blob([JSON.stringify(project)],{type:'application/json'}),'project.json');
+   for(const id of ['media','music']){
+     const file=$(id).files[0];if(file){
+       if(file.size>80*1024*1024)throw Error(id+' is larger than 80MB. Compress it before saving a portable project.');
+       fd.append(id,file,file.name);
+     }
+   }
+   if(voiceData&&voiceSignature===signature())fd.append('voice',voiceData,'voice.mp3');
+   $('status').textContent='Project file প্রস্তুত হচ্ছে...';
+   const response=await fetch('/project/save',{method:'POST',body:fd});
+   if(!response.ok)throw Error('Save Project failed: '+(await response.text()).replace(/<[^>]*>/g,' ').slice(-400));
+   const result=await response.blob();
+   if(projectURL)URL.revokeObjectURL(projectURL);
+   projectURL=URL.createObjectURL(result);
+   const link=document.createElement('a');link.href=projectURL;link.download='japanova-project-'+new Date().toISOString().slice(0,10)+'.jrm';
+   document.body.append(link);link.click();link.remove();
+   $('status').textContent='Project Save সফল। .jrm ফাইলটি নিরাপদ জায়গায় রাখুন।';
+ }catch(err){$('status').textContent=err.message}
+ finally{$('saveProject').disabled=false}
+}
+function safeSetting(id,value){
+ const el=$(id);if(!el||value===undefined||value===null)return;
+ const v=String(value);
+ if(el.tagName==='SELECT'&&!Array.from(el.options).some(o=>o.value===v))return;
+ if(el.type==='range' && (!Number.isFinite(Number(v))||Number(v)<Number(el.min)||Number(v)>Number(el.max)))return;
+ el.value=v;
+}
+function loadFileIntoInput(id,asset){
+ const input=$(id);
+ if(!asset){input.value='';input.dispatchEvent(new Event('change'));return}
+ if(!/^[A-Za-z0-9+/=]+$/.test(asset.data)||asset.data.length>113000000)throw Error('Invalid saved asset');
+ const file=new File([decodeBase64(asset.data)],asset.name||id,{type:asset.type||'application/octet-stream'});
+ const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;
+ input.dispatchEvent(new Event('change'));
+}
+async function loadProject(file){
+ if(locked)return;
+ if(!file||!file.name.toLowerCase().endsWith('.jrm'))throw Error('Choose a .jrm project file');
+ if(file.size>170*1024*1024)throw Error('Project too large (170MB maximum)');
+ $('openProject').disabled=true;
+ try{
+   $('status').textContent='Saved project খুলছে...';
+   const fd=new FormData();fd.append('projectFile',file,file.name);
+   const response=await fetch('/project/load',{method:'POST',body:fd});
+   if(!response.ok)throw Error('Open Project failed: '+(await response.text()).replace(/<[^>]*>/g,' ').slice(-450));
+   const data=await response.json();
+   if(data.format!=='japanova-reel-project'||data.version!==1)throw Error('Unsupported project format');
+   cancelAnimationFrame(raf);$('voiceAudio').pause();invalidateVoice();
+   $('script').value=data.script;
+   for(const [id,value] of Object.entries(data.settings||{}))if(PROJECT_SETTINGS.includes(id))safeSetting(id,value);
+   source=data.script;
+   scenes=data.scenes.map(s=>({text:s.text,color:s.color||'default',transition:s.transition||'default'}));
+   durations=data.durations.map(Number);
+   syncCanvas();
+   editor();
+   loadFileIntoInput('media',data.loaded_assets?.media);
+   loadFileIntoInput('music',data.loaded_assets?.music);
+   const voice=data.loaded_assets?.voice;
+   if(voice&&data.narration?.signature===signature()){
+     voiceData=new Blob([decodeBase64(voice.data)],{type:'audio/mpeg'});
+     voiceURL=URL.createObjectURL(voiceData);voiceSignature=data.narration.signature;
+     wordTimings=data.narration.word_timings||null;
+     wordTimingSource=data.narration.timing_source||'estimated';
+     $('voiceAudio').src=voiceURL;$('voiceAudio').style.display='block';
+   }
+   $('speedValue').textContent=Number($('voiceSpeed').value).toFixed(2)+'×';
+   $('subtitleSizeValue').textContent=$('subtitleSize').value+'px';
+   $('motionSizeValue').textContent=$('motionSize').value+'%';
+   $('fontValue').textContent=$('fontSize').value+' px';
+   draw(0);
+   $('status').textContent='Project Open সফল! Scenes ও Settings ফিরেছে। '+(voiceData?'Voice-ও Restore হয়েছে।':'Voice আবার Generate করতে হবে।');
+ }catch(err){$('status').textContent=err.message}
+ finally{$('openProject').disabled=false;$('projectFile').value=''}
+}
+$('saveProject').onclick=saveProject;
+$('openProject').onclick=()=>$('projectFile').click();
+$('projectFile').onchange=()=>{if($('projectFile').files[0])loadProject($('projectFile').files[0])};
+
+async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems().map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.4.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
 $('media').onchange=()=>{if(bg instanceof HTMLVideoElement)bg.pause();if(bgURL)URL.revokeObjectURL(bgURL);bg=null;let f=$('media').files[0];if(!f){draw(0);return}bgURL=URL.createObjectURL(f);let el=f.type.startsWith('video')?document.createElement('video'):new Image();if(el instanceof HTMLVideoElement){el.muted=true;el.loop=true;el.playsInline=true;el.onloadeddata=()=>{bg=el;draw(0)}}else el.onload=()=>{bg=el;draw(0)};el.src=bgURL};
 $('split').onclick=()=>{try{prepare(true);draw(0)}catch(e){$('status').textContent=e.message}};
 $('preview').onclick=async()=>{try{prepare();if($('voice').value!=='off')await ensureVoice();$('status').textContent='Preview চলছে';play()}catch(e){$('status').textContent=e.message}};
