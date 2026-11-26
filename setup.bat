@@ -7,7 +7,7 @@ if %errorlevel% equ 0 (
  winget install --id Gyan.FFmpeg -e --accept-package-agreements --accept-source-agreements
 )
 echo Installing optional Edge TTS package...
-py -3 -m pip install --upgrade edge-tts
+py -3 -m pip install -r requirements.txt
 if errorlevel 1 echo Could not install edge-tts. Confirm Python and Internet connectivity then retry.
 echo Restart terminal before running START.bat.
 pause
