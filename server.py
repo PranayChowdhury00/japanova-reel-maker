@@ -1,6 +1,8 @@
 """Local-only Reel Maker API with FFmpeg transitions."""
 import http.server, json, pathlib, shutil, subprocess, tempfile, threading, webbrowser
+from urllib.parse import urlsplit,parse_qs
 from voice_engine import make_voice
+from avatar_engine import presenter_svg, build_images, mouth_intervals, open_expression
 from email.parser import BytesParser
 from email.policy import default
 
@@ -31,7 +33,17 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
         path=p/f'subtitle{i}.png'
         if not path.is_file(): raise ValueError(f'Missing subtitle image {i}')
         cmd+=['-loop','1','-framerate',str(fps),'-i',str(path)]
-    audio=first+count+subtitle_count
+    avatar=settings.get('avatar','off')
+    if avatar not in ('off','boy','girl'):raise ValueError('Invalid avatar selection')
+    position=settings.get('avatar_position','center')
+    if position not in ('left','center','right'):raise ValueError('Invalid avatar position')
+    avatar_count=3 if avatar!='off' else 0
+    for pose in ('closed','open','blink') if avatar_count else ():
+        path=p/f'avatar-{pose}.png'
+        if not path.is_file():raise ValueError('Missing avatar image')
+        cmd+=['-loop','1','-framerate',str(fps),'-i',str(path)]
+    avatar_index=first+count+subtitle_count
+    audio=avatar_index+avatar_count
     cmd+=['-stream_loop','-1','-i',str(p/'music')] if music else ['-f','lavfi','-i','anullsrc=r=44100:cl=stereo']
     voice_index=None
     if has_voice:
@@ -53,6 +65,25 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
             y=f'if(lt(t\\,{start+.5:.6f})\\,max(0\\,H*(1-(t-{start:.6f})/0.5))\\,0)'
         filters.append(f'[{previous}][txt{i}]overlay=x={x}:y={y}:shortest=0:eof_action=pass:format=auto[compose{i}]')
         previous=f'compose{i}';start=end
+    if avatar_count:
+        # Relative geometry keeps presenter consistent at Lite / HD / Full HD.
+        aw=max(2,round(w*600/1080/2)*2)
+        ah=max(2,round(h*850/1920/2)*2)
+        ax={'left':round(w*.01),'center':round((w-aw)/2),'right':round(w-aw-w*.01)}[position]
+        ay=round(h*420/1920)
+        for j,pose in enumerate(('closed','open','blink')):
+            filters.append(f'[{avatar_index+j}:v]scale={aw}:{ah},format=rgba[avatar{j}]')
+        filters.append(f'[{previous}][avatar0]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass[body]')
+        previous='body'
+        # Voice-energy-derived mouth activity, sampled from the generated voice track.
+        intervals=mouth_intervals(p/'voice.mp3' if has_voice else None)
+        if intervals:
+            expression=open_expression(intervals)
+            filters.append(f'[{previous}][avatar1]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass:enable={expression}[speaking]')
+            previous='speaking'
+        blink='+'.join(f'between(t\\,{float(v):.2f}\\,{float(v)+.12:.2f})' for v in (2.8,6.9,11.4,16.1,20.9,26.3))
+        filters.append(f'[{previous}][avatar2]overlay=x={ax}:y={ay}:shortest=0:eof_action=pass:enable={blink}[blinking]')
+        previous='blinking'
     if subtitle_count:
         start=0.
         for i,duration in enumerate(durations):
@@ -82,7 +113,20 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path!='/': self.send_error(404);return
+        path=urlsplit(self.path)
+        if path.path=='/avatar':
+            q=parse_qs(path.query)
+            try:
+                gender=q.get('gender',['boy'])[0]
+                pose=q.get('pose',['closed'])[0]
+                data=presenter_svg(gender,pose).encode('utf8')
+            except ValueError:self.send_error(400,'Invalid avatar');return
+            self.send_response(200)
+            self.send_header('Content-Type','image/svg+xml; charset=utf-8')
+            self.send_header('Cache-Control','public, max-age=3600')
+            self.send_header('Content-Length',str(len(data)))
+            self.end_headers();self.wfile.write(data);return
+        if path.path!='/': self.send_error(404);return
         data=(ROOT/'index.html').read_bytes()
         self.send_response(200)
         self.send_header('Content-Type','text/html; charset=utf-8')
@@ -121,6 +165,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                         if key=='voice':has_voice=True
                 if settings is None or not (p/'base.png').is_file():raise ValueError('Missing project settings')
                 if any(not (p/f'scene{i}.png').is_file() for i in range(int(settings['count']))):raise ValueError('Missing scene image')
+                if settings.get('avatar','off')!='off':build_images(p,settings['avatar'])
                 cmd=make_command(p,settings,media,music,still,has_voice)
                 r=subprocess.run(cmd,capture_output=True,timeout=900)
                 if r.returncode:raise RuntimeError(r.stderr.decode(errors='replace')[-2000:])
@@ -136,5 +181,5 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__=='__main__':
     s=http.server.ThreadingHTTPServer(('127.0.0.1',8765),Handler)
     threading.Timer(.5,lambda:webbrowser.open('http://127.0.0.1:8765')).start()
-    print('Japanova Reel Maker V3.4: http://127.0.0.1:8765')
+    print('Japanova Reel Maker V4.0: http://127.0.0.1:8765')
     s.serve_forever()
