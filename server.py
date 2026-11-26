@@ -1,5 +1,5 @@
 """Local-only Reel Maker API with FFmpeg transitions."""
-import http.server, json, pathlib, shutil, subprocess, tempfile, threading, webbrowser, zipfile, io, base64
+import http.server, json, pathlib, shutil, subprocess, tempfile, threading, webbrowser, zipfile, io, base64, os, hmac, binascii
 from urllib.parse import urlsplit,parse_qs
 from voice_engine import make_voice
 from avatar_engine import presenter_svg, mouth_intervals, open_expression
@@ -7,6 +7,11 @@ from email.parser import BytesParser
 from email.policy import default
 
 ROOT = pathlib.Path(__file__).resolve().parent
+CLOUD_LITE = os.environ.get('CLOUD_LITE','0') == '1'
+APP_PASSWORD = os.environ.get('APP_PASSWORD','')
+PUBLIC_HOST = os.environ.get('HOST','0.0.0.0' if CLOUD_LITE else '127.0.0.1')
+PUBLIC_PORT = int(os.environ.get('PORT','8765'))
+WORK_SEMAPHORE = threading.BoundedSemaphore(1)
 QUALITY = {'lite':(540,960,15),'hd':(720,1280,24),'full':(1080,1920,30)}
 TRANSITIONS = {'fade','slide-up','slide-left'}
 PROJECT_FILE_LIMIT = 80 * 1024 * 1024
@@ -251,8 +256,34 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
     return cmd
 
 class Handler(http.server.BaseHTTPRequestHandler):
+    def require_access(self):
+        if not CLOUD_LITE:return False
+        header=self.headers.get('Authorization','')
+        try:
+            scheme,data=header.split(' ',1)
+            if scheme.lower()!='basic':raise ValueError('Auth scheme')
+            decoded=base64.b64decode(data,validate=True).decode('utf8')
+            _,password=decoded.split(':',1)
+            valid=hmac.compare_digest(password,APP_PASSWORD)
+        except (ValueError,UnicodeError,binascii.Error):
+            valid=False
+        if valid:return False
+        self.send_response(401)
+        self.send_header('WWW-Authenticate','Basic realm="Japanova Edu", charset="UTF-8"')
+        self.send_header('Cache-Control','no-store')
+        self.send_header('Content-Length','0')
+        self.end_headers()
+        return True
+
     def do_GET(self):
         path=urlsplit(self.path)
+        if path.path=='/health':
+            data=b'OK'
+            self.send_response(200)
+            self.send_header('Content-Type','text/plain')
+            self.send_header('Content-Length',str(len(data)))
+            self.end_headers();self.wfile.write(data);return
+        if self.require_access():return
         if path.path=='/avatar':
             q=parse_qs(path.query)
             try:
@@ -272,11 +303,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header('Cache-Control','no-store')
         self.end_headers();self.wfile.write(data)
     def do_POST(self):
+        if self.require_access():return
         if self.path not in ('/render','/voice','/project/save','/project/load'):self.send_error(404);return
+        if not WORK_SEMAPHORE.acquire(blocking=False):
+            self.send_error(429,'Another task is running. Try again in a moment.');return
         try:
             if self.path in ('/project/save','/project/load'):
                 n=int(self.headers.get('Content-Length','0'))
-                if not 0<n<PROJECT_TOTAL_LIMIT:raise ValueError('Project request too large')
+                if not 0<n<(24*1024*1024 if CLOUD_LITE else PROJECT_TOTAL_LIMIT):raise ValueError('Project request too large')
                 parts=parse_form(self.headers,self.rfile.read(n))
                 if self.path=='/project/save':
                     if 'project' not in parts:raise ValueError('Missing project settings')
@@ -288,7 +322,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                         for key,filename in [('media','assets/media'),('music','assets/music'),('voice','assets/voice.mp3')]:
                             if key not in parts:continue
                             content=parts[key].get_payload(decode=True)
-                            if len(content)>PROJECT_FILE_LIMIT:raise ValueError(f'{key} too large for portable project (80 MB max)')
+                            if len(content)>(10*1024*1024 if CLOUD_LITE else PROJECT_FILE_LIMIT):raise ValueError(f'{key} too large for cloud project (10 MB max)')
                             z.writestr(filename,content)
                             manifest[key]={'name':parts[key].get_filename() or key,'type':parts[key].get_content_type(),'size':len(content)}
                         project['assets']=manifest
@@ -301,7 +335,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     self.end_headers();self.wfile.write(content);return
                 if 'projectFile' not in parts:raise ValueError('Choose a .jrm project')
                 payload=parts['projectFile'].get_payload(decode=True)
-                if len(payload)>PROJECT_TOTAL_LIMIT:raise ValueError('Project exceeds 170 MB')
+                if len(payload)>(24*1024*1024 if CLOUD_LITE else PROJECT_TOTAL_LIMIT):raise ValueError('Project too large for cloud')
                 with zipfile.ZipFile(io.BytesIO(payload)) as z:
                     members=z.namelist()
                     if len(members)>5 or not set(members).issubset({'project.json','assets/media','assets/music','assets/voice.mp3'}):
@@ -338,7 +372,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(payload)
                 return
             n=int(self.headers.get('Content-Length','0'))
-            if not 0<n<500000000:raise ValueError('Invalid upload size')
+            if not 0<n<(24*1024*1024 if CLOUD_LITE else 500000000):raise ValueError('Upload too large for free cloud server (24 MB max)')
             head=('Content-Type: '+self.headers['Content-Type']+'\r\nMIME-Version: 1.0\r\n\r\n').encode()
             msg=BytesParser(policy=default).parsebytes(head+self.rfile.read(n))
             with tempfile.TemporaryDirectory() as d:
@@ -356,6 +390,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 if settings is None or not (p/'base.png').is_file():raise ValueError('Missing project settings')
                 if any(not (p/f'scene{i}.png').is_file() for i in range(int(settings['count']))):raise ValueError('Missing scene image')
                 if settings.get('avatar','off')!='off' and any(not (p/f'avatar-{pose}.png').is_file() for pose in ('closed','open','blink')):raise ValueError('Missing presenter images; refresh the page and retry')
+                if CLOUD_LITE and settings.get('quality')!='lite':raise ValueError('Free cloud supports Lite 540p only. Choose Lite quality.')
                 cmd=make_command(p,settings,media,music,still,has_voice)
                 r=subprocess.run(cmd,capture_output=True,timeout=900)
                 if r.returncode:raise RuntimeError(r.stderr.decode(errors='replace')[-2000:])
@@ -366,10 +401,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 with file.open('rb') as f:shutil.copyfileobj(f,self.wfile)
         except (BrokenPipeError,ConnectionResetError):pass
+        except ValueError as e:self.send_error(400,str(e).replace('\n',' ')[:600])
         except Exception as e:self.send_error(500,str(e).replace('\n',' ')[:1200])
+        finally:WORK_SEMAPHORE.release()
 
 if __name__=='__main__':
-    s=http.server.ThreadingHTTPServer(('127.0.0.1',8765),Handler)
-    threading.Timer(.5,lambda:webbrowser.open('http://127.0.0.1:8765')).start()
-    print('Japanova Reel Maker V4.3: http://127.0.0.1:8765')
+    if CLOUD_LITE and len(APP_PASSWORD)<12:
+        raise RuntimeError('Set APP_PASSWORD in cloud environment (at least 12 characters)')
+    s=http.server.ThreadingHTTPServer((PUBLIC_HOST,PUBLIC_PORT),Handler)
+    if not CLOUD_LITE:
+        threading.Timer(.5,lambda:webbrowser.open(f'http://127.0.0.1:{PUBLIC_PORT}')).start()
+    print(f'Japanova Reel Maker serving on {PUBLIC_HOST}:{PUBLIC_PORT}; cloud_lite={CLOUD_LITE}')
     s.serve_forever()
