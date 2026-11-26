@@ -33,3 +33,15 @@ All V3.2 features remain: colorful bold text, shadows, gradients, transitions, s
 - Python syntax checks and local synthetic audio rendering test completed in this environment.
 - Full remote Edge TTS playback requires an online Windows test because this environment does not have access to the Microsoft speech endpoint.
 - Voice-to-scene timings are derived from each rendered speech clip, but FFmpeg frame rounding can create minor timing differences.
+## Troubleshooting: `No audio was received` (v3.3.1)
+
+Edge TTS sometimes returns no audio even with valid text. The app now retries Edge TTS up to three times and automatically tries the Google Translate TTS fallback if Edge fails. Both providers need an internet connection and can be unavailable.
+
+1. Close the app and run `git pull origin main`.
+2. Run `py -3 -m pip install --upgrade -r requirements.txt`.
+3. Restart with `.\\START.bat`, then refresh with `Ctrl+Shift+R`.
+4. Try a short Bengali sentence, e.g. `জাপানে আপনাকে স্বাগতম।` using Bengali Male or Female.
+5. Check the status: it states which provider produced audio. Backup TTS does not preserve male/female voice choice.
+6. If **both** providers fail, check connection/firewall and retry later. Voice Off still allows silent/music-only MP4 export.
+
+This fallback is not an official Microsoft/Google commercial API or uptime guarantee. Check provider usage terms before commercial publishing. Do not bypass service blocks or quotas.
