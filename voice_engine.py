@@ -154,7 +154,7 @@ def make_voice(scenes, voice, speed, duration_mode='auto'):
     ):
         raise ValueError('Provide 1–20 nonempty scenes, each <=400 characters')
     if sum(map(len, scenes)) > 2500:
-        raise ValueError('Script too long for 30-second reel')
+        raise ValueError('Script too long (maximum 2500 characters)')
     captions = [clean_speech(text) for text in scenes]
     if any(not caption for caption in captions):
         raise ValueError('One scene contains no speakable text')
@@ -202,11 +202,12 @@ def make_voice(scenes, voice, speed, duration_mode='auto'):
             lengths = [probe_seconds(path) for path in paths]
 
         reserved = sum(lengths) + .13 * len(lengths)
-        if reserved > 29.6:
-            raise ValueError(
-                f'Voice needs {reserved:.1f}s. Shorten script or increase voice speed to fit 30s.'
-            )
         if duration_mode == 'fixed30':
+            if reserved > 30:
+                raise ValueError(
+                    f'Voice needs {reserved:.1f}s, but Fixed 30 Seconds is selected. '
+                    'Choose Auto Duration (up to 60s), shorten the script, or increase voice speed.'
+                )
             spare = 30 - reserved
             weights = [max(1, len(s)) for s in captions]
             total = sum(weights)
@@ -214,12 +215,16 @@ def make_voice(scenes, voice, speed, duration_mode='auto'):
                          for length, weight in zip(lengths, weights)]
             durations[-1] += 30 - sum(durations)
         else:
-            # Natural-length reel with modest breathing room and an ending hold.
-            # Each scene ends a little after its spoken clip, never bloated to 30s.
+            # Natural-length narration plus 0.22s between scenes and a short
+            # final hold. Never silently cut audio to meet a duration cap.
             durations = [length + .22 for length in lengths]
             durations[-1] += .65
-            if sum(durations) > 30:
-                durations[-1] = max(.1, durations[-1]-(sum(durations)-30))
+            total_seconds = sum(durations)
+            if total_seconds > 60:
+                raise ValueError(
+                    f'Voice and pauses need {total_seconds:.1f}s, longer than '
+                    'the Auto Duration 60s limit. Shorten the script or increase voice speed.'
+                )
         starts = []
         position = 0.
         for duration in durations:
