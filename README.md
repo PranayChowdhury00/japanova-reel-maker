@@ -77,3 +77,15 @@ This repository now includes a Dockerfile and Render Blueprint (render.yaml) to 
 
 Render docs: https://render.com/docs/free · https://render.com/docs/blueprint-spec
 
+
+## Auto Duration up to 60 seconds — Voice fix (2026-11-28)
+
+Previously, scripts requiring over 29.6 seconds of TTS triggered HTTP 400 even when **Auto Duration** was selected. The video editor and voice engine now support a natural-length **Auto Duration of up to 60 seconds**, with short pauses between scenes and a small final hold. Audio is never silently truncated to 30 seconds.
+
+- **Auto — Follows voice (up to 60s):** 46.5 seconds of narration becomes approximately 47–49 seconds of video depending on the number of scenes.
+- **Fixed 30 Seconds:** still strictly limited to 30 seconds. If narration is longer, choose Auto, shorten the script or increase speed.
+- Video export, saved project durations and editor estimates have been increased to 60 seconds.
+- Videos exceeding 60 seconds must still be shortened or split into separate reels; cloud free hosting may struggle with longer render jobs.
+- Added a regression test suite at `tests/test_duration.py` (run `python -m unittest discover -s tests -v`). Runtime tests in a real browser and Windows/Cloud FFmpeg environment remain necessary.
+
+Update locally using `git pull origin main`, restart `START.bat`, hard-refresh the page with `Ctrl+Shift+R`, choose Auto Duration and generate voice again.
