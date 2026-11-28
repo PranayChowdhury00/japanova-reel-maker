@@ -89,3 +89,10 @@
 - Optional CLOUD_LITE mode demands APP_PASSWORD for HTTP Basic Auth, enforces Lite 540p, bounded upload sizes and one concurrent server task.
 - Hosted UI automatically switches to Lite export; local Windows edition remains unchanged.
 - Deployment and real FFmpeg cloud export are not yet verified; free service has severe CPU/RAM limits.
+
+## V4.7 — Smart Timeline Editor (2026-11-28)
+- Timeline scene strip + scrubber with playhead and live scene highlighting.
+- Manual Smart Focus topic, appearance offset and duration, with 3 distinct focus moments and separation checks.
+- Per-scene Presenter visibility, Caption visibility and Caption Delay in preview and FFmpeg render.
+- Lock voice-synced durations after generation and preserve all timeline controls in .jrm projects.
+- Added regression tests for timeline export filter generation; Windows full export test pending.
