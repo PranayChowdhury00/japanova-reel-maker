@@ -1,4 +1,4 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.7</title>
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.8</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eff2f8;color:#15233b;font:15px system-ui,'Nirmala UI',sans-serif}header{background:linear-gradient(110deg,#111f39,#263d67);padding:20px max(20px,calc((100% - 1260px)/2));color:#fff;display:flex;justify-content:space-between;align-items:center}header b{font-size:20px}header small{color:#bbcae5}main{max-width:1260px;margin:25px auto;display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:22px;padding:0 18px}section{background:#fff;border:1px solid #dce3ef;border-radius:18px;padding:24px;box-shadow:0 8px 30px #10233b0a}h1{font-size:23px;margin:0 0 5px}h2{font-size:18px;margin:28px 0 10px}p{line-height:1.5}small{color:#61718c}label{display:block;font-weight:700;margin:14px 0 6px}input,textarea,select,button{font:inherit;width:100%;padding:11px;border:1px solid #cbd5e4;border-radius:9px;background:#fff;color:inherit}textarea{height:138px;resize:vertical}button{background:#df2e4d;color:#fff;border:none;font-weight:750;cursor:pointer;margin:10px 0 0}button:hover{filter:brightness(.96)}button:disabled{opacity:.5;cursor:wait}.secondary{background:#edf2f9;color:#233e64}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene{border:1px solid #d6dfed;background:#f8fafd;padding:14px;border-radius:12px;margin:11px 0}.scene h3{margin:0 0 5px;font-size:14px}.scene textarea{height:76px}.scene .twocol{grid-template-columns:1fr 1fr}.scene label{margin:7px 0 5px;font-size:12px}.tip{background:#eaf1fd;padding:12px 14px;border-radius:10px;color:#38527c;margin:14px 0;font-size:13px}.preview{position:sticky;top:16px;text-align:center;align-self:start}.preview canvas{display:block;margin:12px auto;width:100%;max-width:292px;aspect-ratio:9/16;background:#0c1631;border-radius:15px;box-shadow:0 14px 40px #101e3540}.preview h2{margin:2px 0}progress{width:100%;height:11px;margin-top:14px;accent-color:#e02f50}#download[hidden]{display:none}#download{display:block;text-decoration:none;color:white;background:#187b5e;border-radius:8px;padding:13px;margin-top:10px;font-weight:700}#status{overflow-wrap:anywhere;font-size:13px;color:#254b76}.swatches{display:flex;gap:9px;flex-wrap:wrap}.swatch{width:38px;height:38px;padding:0;border:3px solid #fff;box-shadow:0 0 0 1px #b9c5d5;border-radius:50%;margin:0}.swatch.active{box-shadow:0 0 0 3px #253e62}.chip{background:#e6edf6;border-radius:999px;padding:4px 10px;display:inline-block;font-size:12px;color:#3b5274}@media(max-width:850px){main{grid-template-columns:1fr}.preview{position:static}header{padding:16px}section{padding:16px}}
 
@@ -148,6 +148,30 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 .scene-visibility label:last-child{flex-direction:column;align-items:start}
 .scene-visibility input[type=number]{width:100px;max-width:100%}
 @media(max-width:480px){.focus-grid{grid-template-columns:1fr 1fr}.timeline-segment b{font-size:9px}.timeline-studio{padding:9px}}
+
+/* V4.8 — reusable, portable custom image assets */
+.custom-library{border:1px solid #dae6f3;border-radius:14px;padding:14px;margin:13px 0;background:#f8faff}
+.custom-library-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.custom-library-top strong{font-size:13px;color:#243d61}
+.custom-library-top span{font-size:11px;color:#7083a4}
+.custom-library input[type=file]{font-size:12px;max-width:100%;margin:9px 0}
+.custom-asset-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:8px 0}
+.asset-card{display:grid;grid-template-columns:1fr auto;gap:5px;padding:7px;border-radius:11px;border:1px solid #dce5f2;background:white;align-items:center}
+.asset-card img{grid-column:1/-1;width:100%;height:80px;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(#edf1f5 0% 25%,white 0% 50%) 50%/14px 14px}
+.asset-card span{grid-column:1/-1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asset-card button{font-size:11px!important;padding:7px!important;margin:0!important}
+.asset-edit-toggle{display:flex;align-items:center;gap:7px;font-size:11px;margin:8px 0}
+.asset-edit-toggle input{width:15px;height:15px;margin:0}
+.custom-scene-control{border-top:1px dashed #d0deeb;margin-top:12px;padding-top:12px}
+.custom-scene-control strong{display:block;font-size:12px;margin-bottom:7px}
+.custom-scene-control p{font-size:11px;color:#637795;margin:0 0 10px}
+.custom-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.custom-grid label{font-size:11px}
+.custom-grid input{display:block;width:100%;min-width:0;margin-top:4px}
+.custom-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.custom-actions button{font-size:11px!important;margin:0!important}
+#canvas{cursor:grab}
+#canvas:active{cursor:grabbing}
 </style></head><body><header class="brand-header"><div class="header-inner"><div class="brand-mark" aria-hidden="true">J</div><div class="brand-copy"><strong>JAPANOVA <em>EDU</em></strong><small>Creative Studio</small></div><div class="header-controls"><button id="openProject" type="button" title="Open saved project">📂 <span>Open</span></button><button id="saveProject" type="button" title="Save project">💾 <span>Save</span></button></div></div></header>
 <main><section class="workspace">
 <div class="studio-intro"><div><h1>নতুন রিল তৈরি করুন</h1></div></div>
@@ -203,6 +227,14 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 <div class="timeline-controls"><button id="timelinePlay" type="button" class="secondary">▶ Play from start</button><button id="timelineStart" type="button" class="secondary">↶ Start</button></div>
 <p class="timeline-hint" id="timelineHint">Tap a scene block or drag the scrubber to inspect that moment.</p>
 </div>
+<section class="custom-library" aria-label="Custom image library">
+<div class="custom-library-top"><strong>🖼️ Custom Image Library</strong><span id="assetCount">0/8 saved</span></div>
+<p class="subtle">PNG, JPG or WebP যোগ করুন। Timeline থেকে Scene নির্বাচন করে ছবির নিচে Use চাপুন। Preview-তে Drag করুন, নিচের কোণা ধরে Resize করুন।</p>
+<input id="assetUpload" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+<div id="customAssetList" class="custom-asset-list"></div>
+<label class="asset-edit-toggle"><input type="checkbox" id="assetEditMode" checked> Preview-তে ছবির Border ও Drag Handle দেখাও</label>
+<p id="assetHint" class="subtle">Up to 8 images. Images are optimized for portable .jrm projects.</p>
+</section>
 <div class="scene-heading"><div><h2>Scene Editor <small id="total"></small></h2><p class="subtle">প্রতিটি Scene-এর লেখা, Duration ও Transition ঠিক করুন।</p></div><button id="split" class="secondary">✦ Auto Split Sentences</button></div><div id="editor"></div></div>
 <div class="studio-actions"><button id="preview" class="secondary">▶ Preview</button><button id="export">⬇ Export MP4</button></div><div class="export-feedback"><progress id="progress" max="30" value="0"></progress><p role="status" id="status" aria-live="polite" hidden></p><a id="download" hidden>ভিডিও সেভ করুন</a></div><small class="footer-note">Local FFmpeg export • Render চলাকালে অ্যাপ বন্ধ করবেন না।</small>
 </section><section class="preview" id="livePreviewPanel"><div class="preview-heading"><h2>Preview</h2><span id="previewDuration" class="preview-duration">—</span></div><div class="canvas-wrap"><canvas id="canvas" width="720" height="1280"></canvas></div><div class="preview-meta"><span id="previewSceneCount"></span><span>9:16</span></div></section></main>
@@ -552,6 +584,7 @@ function draw(t,mode='preview',onlyIndex=0){ctx.save();ctx.setTransform(c.width/
 if(type==='slide-up')ctx.translate(0,(1-p)*155);if(type==='slide-left')ctx.translate((1-p)*220,0);if(type==='pop'){let scale=.76+.24*p;ctx.translate(W/2,960);ctx.scale(scale,scale);ctx.translate(-W/2,-960)}if(type==='wipe'){ctx.beginPath();ctx.rect(0,0,W*p,H);ctx.clip()}if($('avatar').value==='off')caption(i);ctx.restore();
 if(scenes[i].presenterVisible!==false)avatarPicture(t);
 motionPreview(t);
+drawCustomImage(t);
 if(scenes[i].captionVisible!==false&&local>=Number(scenes[i].captionDelay||0)){
  if($('subtitleMode').value==='short')shortSubtitle(t,i);else subtitle(i);
 }ctx.font='30px system-ui';ctx.fillStyle='#e0e5f0';ctx.textAlign='center';ctx.fillText(`${i+1} / ${scenes.length}`,W/2,1765);ctx.restore()}
@@ -595,6 +628,7 @@ async function presenterPNG(pose){
 }
 function checkBeforeExport(){
  if(!scenes.length)throw Error('No scenes. Click Auto Split Sentences.');
+ validateCustomImages();
  if(scenes.some((s,i)=>!Number.isFinite(Number(s.captionDelay||0))||Number(s.captionDelay||0)<0||Number(s.captionDelay||0)>=timing()[i]))
    throw Error('Caption delay must fit inside its scene.');
  motionItems(true);
@@ -625,9 +659,10 @@ function captureProject(){
  const validScenes=scenes.map(s=>({text:s.text,color:s.color,transition:s.transition,
  captionVisible:s.captionVisible!==false,presenterVisible:s.presenterVisible!==false,captionDelay:s.captionDelay??0,
  focusMode:s.focusMode||'auto',focusTopic:s.focusTopic||'coe',
- focusOffset:s.focusOffset??.3,focusLength:s.focusLength??1.6}));
+ focusOffset:s.focusOffset??.3,focusLength:s.focusLength??1.6,
+ custom:s.custom?safeCustom(s.custom):null}));
  return {format:'japanova-reel-project',version:1,saved_at:new Date().toISOString(),script:$('script').value,
-         settings,scenes:validScenes,durations:[...durations],
+         settings,scenes:validScenes,durations:[...durations],image_library:imageLibrary,
          narration:voiceData&&voiceSignature===signature()?{signature:voiceSignature,word_timings:wordTimings,timing_source:wordTimingSource}:null};
 }
 async function saveProject(){
@@ -692,7 +727,10 @@ async function loadProject(file){
  focusMode:['auto','off','manual'].includes(s.focusMode)?s.focusMode:'auto',
  focusTopic:motionKeywords.some(k=>k.id===s.focusTopic)?s.focusTopic:'coe',
  focusOffset:Number.isFinite(Number(s.focusOffset))?Number(s.focusOffset):.3,
- focusLength:Number.isFinite(Number(s.focusLength))?Number(s.focusLength):1.6}));
+ focusLength:Number.isFinite(Number(s.focusLength))?Number(s.focusLength):1.6,
+ custom:safeCustom(s.custom)}));
+   imageLibrary=Array.isArray(data.image_library)?data.image_library:[];
+   saveImageLibrary();preloadImageLibrary();
    durations=data.durations.map(Number);
    syncCanvas();
    editor();
@@ -721,7 +759,10 @@ $('projectFile').onchange=()=>{if($('projectFile').files[0])loadProject($('proje
 
 async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,
  caption_delays:scenes.map(s=>Number(s.captionDelay||0)),caption_visible:scenes.map(s=>s.captionVisible!==false),
- avatar_visible:scenes.map(s=>s.presenterVisible!==false),subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems(true).map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.7.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent='Error: '+err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;editor();draw(0)}}
+ avatar_visible:scenes.map(s=>s.presenterVisible!==false),subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems(true).map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value),custom_images:customImageMoments()}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');
+for(const item of customImageMoments()){
+ fd.append('custom'+item.scene,await makeCustomLayer(item.scene),'custom'+item.scene+'.png');
+}for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.8.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent='Error: '+err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;editor();draw(0)}}
 $('media').onchange=()=>{if(bg instanceof HTMLVideoElement)bg.pause();if(bgURL)URL.revokeObjectURL(bgURL);bg=null;let f=$('media').files[0];if(!f){draw(0);return}bgURL=URL.createObjectURL(f);let el=f.type.startsWith('video')?document.createElement('video'):new Image();if(el instanceof HTMLVideoElement){el.muted=true;el.loop=true;el.playsInline=true;el.onloadeddata=()=>{bg=el;draw(0)}}else el.onload=()=>{bg=el;draw(0)};el.src=bgURL};
 $('split').onclick=()=>{try{prepare(true);draw(0)}catch(e){$('status').textContent='Error: '+e.message}};
 $('preview').onclick=async()=>{try{prepare();if($('voice').value!=='off')await ensureVoice();$('status').textContent='Preview চলছে';play()}catch(e){$('status').textContent='Error: '+e.message}};
@@ -823,4 +864,6 @@ if(isCloudLite){
 }
 
 syncCanvas();prepare();initAvatars();draw(0);
-</script></body></html>
+</script>
+<script src="/custom_assets.js"></script>
+</body></html>
