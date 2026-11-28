@@ -142,6 +142,11 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 .focus-grid label{font-size:11px;margin:0!important;color:#61738f}
 .focus-grid select,.focus-grid input{display:block;margin-top:5px;width:100%;min-width:0}
 .focus-grid :disabled{opacity:.55}
+.scene-visibility{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:12px}
+.scene-visibility label{display:flex;align-items:center;gap:5px;max-width:100%;font-size:11px}
+.scene-visibility input[type=checkbox]{width:16px;height:16px;margin:0}
+.scene-visibility label:last-child{flex-direction:column;align-items:start}
+.scene-visibility input[type=number]{width:100px;max-width:100%}
 @media(max-width:480px){.focus-grid{grid-template-columns:1fr 1fr}.timeline-segment b{font-size:9px}.timeline-studio{padding:9px}}
 </style></head><body><header class="brand-header"><div class="header-inner"><div class="brand-mark" aria-hidden="true">J</div><div class="brand-copy"><strong>JAPANOVA <em>EDU</em></strong><small>Creative Studio</small></div><div class="header-controls"><button id="openProject" type="button" title="Open saved project">📂 <span>Open</span></button><button id="saveProject" type="button" title="Save project">💾 <span>Save</span></button></div></div></header>
 <main><section class="workspace">
@@ -237,6 +242,26 @@ const offsetInput=document.createElement('input');offsetInput.type='number';offs
 const lengthWrap=document.createElement('label');lengthWrap.textContent='Visible for (seconds)';
 const lengthInput=document.createElement('input');lengthInput.type='number';lengthInput.min='.1';lengthInput.max='2.6';lengthInput.step='.1';lengthInput.value=String(s.focusLength??1.6);lengthInput.setAttribute('aria-label','Scene '+(i+1)+' object duration');lengthWrap.append(lengthInput);
 fg.append(modeWrap,kindWrap,offsetWrap,lengthWrap);focusBox.append(focusHead,fg);
+const visibility=document.createElement('div');visibility.className='scene-visibility';
+const captionToggle=document.createElement('label'),captionCheck=document.createElement('input');
+captionCheck.type='checkbox';captionCheck.checked=s.captionVisible!==false;
+captionCheck.addEventListener('change',()=>{s.captionVisible=captionCheck.checked;draw(timelineTime)});
+captionToggle.append(captionCheck,document.createTextNode(' Show Captions'));
+const presenterToggle=document.createElement('label'),presenterCheck=document.createElement('input');
+presenterCheck.type='checkbox';presenterCheck.checked=s.presenterVisible!==false;
+presenterCheck.addEventListener('change',()=>{s.presenterVisible=presenterCheck.checked;draw(timelineTime)});
+presenterToggle.append(presenterCheck,document.createTextNode(' Show Presenter'));
+const captionDelayLabel=document.createElement('label');captionDelayLabel.textContent='Caption delay (seconds)';
+const captionDelay=document.createElement('input');captionDelay.type='number';captionDelay.min='0';captionDelay.max='60';captionDelay.step='.1';captionDelay.value=String(s.captionDelay??0);
+captionDelay.setAttribute('aria-label','Scene '+(i+1)+' caption delay');
+captionDelay.addEventListener('change',()=>{
+ const v=Number(captionDelay.value);
+ if(!Number.isFinite(v)||v<0||v>=timing()[i]){captionDelay.value=String(s.captionDelay??0);$('timelineHint').textContent='Caption delay must fit inside Scene '+(i+1);return}
+ s.captionDelay=v;draw(timelineTime)
+});
+captionDelayLabel.append(captionDelay);
+visibility.append(captionToggle,presenterToggle,captionDelayLabel);
+focusBox.append(visibility);
 function focusChanged(){
  s.focusMode=mode.value;s.focusTopic=kind.value;
  s.focusOffset=Number(offsetInput.value);s.focusLength=Number(lengthInput.value);
@@ -524,7 +549,12 @@ function initAvatars(){
 function background(t,forExport=false,hasMedia=false){let accent={red:'#ed3151',blue:'#4b94fc',purple:'#b46afa',gold:'#f5ba57'}[$('theme').value],g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#0f2744');g.addColorStop(1,'#091020');ctx.clearRect(0,0,W,H);if(!hasMedia){ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}else if(!forExport&&bg){let w=bg.videoWidth||bg.naturalWidth,h=bg.videoHeight||bg.naturalHeight;if(w&&h){let scale=Math.max(W/w,H/h);ctx.drawImage(bg,(W-w*scale)/2,(H-h*scale)/2,w*scale,h*scale)}}if(!hasMedia){ctx.fillStyle=accent;ctx.beginPath();ctx.arc(790,450,200,0,Math.PI*2);ctx.fill();ctx.fillStyle='#264967';ctx.beginPath();ctx.moveTo(0,1240);ctx.lineTo(570,570);ctx.lineTo(1080,1250);ctx.fill();ctx.fillStyle='#dde6f1';ctx.beginPath();ctx.moveTo(570,570);ctx.lineTo(710,750);ctx.lineTo(575,720);ctx.lineTo(433,750);ctx.fill()}
 ctx.fillStyle='#03152ac0';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='800 49px system-ui,sans-serif';ctx.fillText($('brand').value,W/2,165,900);ctx.fillStyle=accent;ctx.fillRect(90,210,900,9);ctx.fillStyle=accent;ctx.fillRect(90,1560,900,10);ctx.fillStyle='#fff';ctx.font='700 40px system-ui,sans-serif';ctx.fillText('FOLLOW FOR MORE',W/2,1680)}
 function draw(t,mode='preview',onlyIndex=0){ctx.save();ctx.setTransform(c.width/W,0,0,c.height/H,0,0);if(mode==='overlay'){ctx.clearRect(0,0,W,H);if($('avatar').value==='off')caption(onlyIndex);ctx.restore();return}if(mode==='base'){background(0,true,!!$('media').files[0]);ctx.restore();return}if(mode==='subtitle'){ctx.clearRect(0,0,W,H);subtitle(onlyIndex);ctx.restore();return}background(t,false,!!$('media').files[0]&&!!bg);let {i,d,local}=active(t),type=scenes[i].transition==='default'?$('transition').value:scenes[i].transition;ctx.save();let p=Math.min(1,local/.5),o=Math.max(0,Math.min(1,local/.3,(d-local)/.28));ctx.globalAlpha=o;
-if(type==='slide-up')ctx.translate(0,(1-p)*155);if(type==='slide-left')ctx.translate((1-p)*220,0);if(type==='pop'){let scale=.76+.24*p;ctx.translate(W/2,960);ctx.scale(scale,scale);ctx.translate(-W/2,-960)}if(type==='wipe'){ctx.beginPath();ctx.rect(0,0,W*p,H);ctx.clip()}if($('avatar').value==='off')caption(i);ctx.restore();avatarPicture(t);motionPreview(t);if($('subtitleMode').value==='short')shortSubtitle(t,i);else subtitle(i);ctx.font='30px system-ui';ctx.fillStyle='#e0e5f0';ctx.textAlign='center';ctx.fillText(`${i+1} / ${scenes.length}`,W/2,1765);ctx.restore()}
+if(type==='slide-up')ctx.translate(0,(1-p)*155);if(type==='slide-left')ctx.translate((1-p)*220,0);if(type==='pop'){let scale=.76+.24*p;ctx.translate(W/2,960);ctx.scale(scale,scale);ctx.translate(-W/2,-960)}if(type==='wipe'){ctx.beginPath();ctx.rect(0,0,W*p,H);ctx.clip()}if($('avatar').value==='off')caption(i);ctx.restore();
+if(scenes[i].presenterVisible!==false)avatarPicture(t);
+motionPreview(t);
+if(scenes[i].captionVisible!==false&&local>=Number(scenes[i].captionDelay||0)){
+ if($('subtitleMode').value==='short')shortSubtitle(t,i);else subtitle(i);
+}ctx.font='30px system-ui';ctx.fillStyle='#e0e5f0';ctx.textAlign='center';ctx.fillText(`${i+1} / ${scenes.length}`,W/2,1765);ctx.restore()}
 function signature(){return JSON.stringify({scenes:scenes.map(s=>s.text.trim()),voice:$('voice').value,speed:Number($('voiceSpeed').value),duration_mode:$('durationMode').value})}
 function invalidateVoice(){wordTimings=null;wordTimingSource='estimated';if(voiceURL){URL.revokeObjectURL(voiceURL);voiceURL=null}voiceData=null;voiceSignature='';let a=$('voiceAudio');a.pause();a.removeAttribute('src');a.style.display='none';}
 function decodeBase64(value){let binary=atob(value),a=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)a[i]=binary.charCodeAt(i);return a}
@@ -565,6 +595,8 @@ async function presenterPNG(pose){
 }
 function checkBeforeExport(){
  if(!scenes.length)throw Error('No scenes. Click Auto Split Sentences.');
+ if(scenes.some((s,i)=>!Number.isFinite(Number(s.captionDelay||0))||Number(s.captionDelay||0)<0||Number(s.captionDelay||0)>=timing()[i]))
+   throw Error('Caption delay must fit inside its scene.');
  motionItems(true);
  if(scenes.some(s=>!s.text.trim()))throw Error('Empty scene found. Complete or delete that scene.');
  if(scenes.some(s=>s.text.length>400))throw Error('A scene exceeds 400 characters. Split it into shorter sentences.');
@@ -591,6 +623,7 @@ function captureProject(){
  prepare();
  const settings={};for(const id of PROJECT_SETTINGS)settings[id]=$(id).value;
  const validScenes=scenes.map(s=>({text:s.text,color:s.color,transition:s.transition,
+ captionVisible:s.captionVisible!==false,presenterVisible:s.presenterVisible!==false,captionDelay:s.captionDelay??0,
  focusMode:s.focusMode||'auto',focusTopic:s.focusTopic||'coe',
  focusOffset:s.focusOffset??.3,focusLength:s.focusLength??1.6}));
  return {format:'japanova-reel-project',version:1,saved_at:new Date().toISOString(),script:$('script').value,
@@ -654,6 +687,8 @@ async function loadProject(file){
    for(const [id,value] of Object.entries(data.settings||{}))if(PROJECT_SETTINGS.includes(id))safeSetting(id,value);
    source=data.script;
    scenes=data.scenes.map(s=>({text:s.text,color:s.color||'default',transition:s.transition||'default',
+ captionVisible:s.captionVisible!==false,presenterVisible:s.presenterVisible!==false,
+ captionDelay:Number.isFinite(Number(s.captionDelay))?Math.max(0,Number(s.captionDelay)):0,
  focusMode:['auto','off','manual'].includes(s.focusMode)?s.focusMode:'auto',
  focusTopic:motionKeywords.some(k=>k.id===s.focusTopic)?s.focusTopic:'coe',
  focusOffset:Number.isFinite(Number(s.focusOffset))?Number(s.focusOffset):.3,
@@ -684,7 +719,9 @@ $('saveProject').onclick=saveProject;
 $('openProject').onclick=()=>$('projectFile').click();
 $('projectFile').onchange=()=>{if($('projectFile').files[0])loadProject($('projectFile').files[0])};
 
-async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems(true).map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.7.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
+async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,
+ caption_delays:scenes.map(s=>Number(s.captionDelay||0)),caption_visible:scenes.map(s=>s.captionVisible!==false),
+ avatar_visible:scenes.map(s=>s.presenterVisible!==false),subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems(true).map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.7.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
 $('media').onchange=()=>{if(bg instanceof HTMLVideoElement)bg.pause();if(bgURL)URL.revokeObjectURL(bgURL);bg=null;let f=$('media').files[0];if(!f){draw(0);return}bgURL=URL.createObjectURL(f);let el=f.type.startsWith('video')?document.createElement('video'):new Image();if(el instanceof HTMLVideoElement){el.muted=true;el.loop=true;el.playsInline=true;el.onloadeddata=()=>{bg=el;draw(0)}}else el.onload=()=>{bg=el;draw(0)};el.src=bgURL};
 $('split').onclick=()=>{try{prepare(true);draw(0)}catch(e){$('status').textContent=e.message}};
 $('preview').onclick=async()=>{try{prepare();if($('voice').value!=='off')await ensureVoice();$('status').textContent='Preview চলছে';play()}catch(e){$('status').textContent=e.message}};
