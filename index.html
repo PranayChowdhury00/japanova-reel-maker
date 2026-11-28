@@ -1,4 +1,4 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.5.1</title>
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Japanova Reel Maker V4.7</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eff2f8;color:#15233b;font:15px system-ui,'Nirmala UI',sans-serif}header{background:linear-gradient(110deg,#111f39,#263d67);padding:20px max(20px,calc((100% - 1260px)/2));color:#fff;display:flex;justify-content:space-between;align-items:center}header b{font-size:20px}header small{color:#bbcae5}main{max-width:1260px;margin:25px auto;display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:22px;padding:0 18px}section{background:#fff;border:1px solid #dce3ef;border-radius:18px;padding:24px;box-shadow:0 8px 30px #10233b0a}h1{font-size:23px;margin:0 0 5px}h2{font-size:18px;margin:28px 0 10px}p{line-height:1.5}small{color:#61718c}label{display:block;font-weight:700;margin:14px 0 6px}input,textarea,select,button{font:inherit;width:100%;padding:11px;border:1px solid #cbd5e4;border-radius:9px;background:#fff;color:inherit}textarea{height:138px;resize:vertical}button{background:#df2e4d;color:#fff;border:none;font-weight:750;cursor:pointer;margin:10px 0 0}button:hover{filter:brightness(.96)}button:disabled{opacity:.5;cursor:wait}.secondary{background:#edf2f9;color:#233e64}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene{border:1px solid #d6dfed;background:#f8fafd;padding:14px;border-radius:12px;margin:11px 0}.scene h3{margin:0 0 5px;font-size:14px}.scene textarea{height:76px}.scene .twocol{grid-template-columns:1fr 1fr}.scene label{margin:7px 0 5px;font-size:12px}.tip{background:#eaf1fd;padding:12px 14px;border-radius:10px;color:#38527c;margin:14px 0;font-size:13px}.preview{position:sticky;top:16px;text-align:center;align-self:start}.preview canvas{display:block;margin:12px auto;width:100%;max-width:292px;aspect-ratio:9/16;background:#0c1631;border-radius:15px;box-shadow:0 14px 40px #101e3540}.preview h2{margin:2px 0}progress{width:100%;height:11px;margin-top:14px;accent-color:#e02f50}#download[hidden]{display:none}#download{display:block;text-decoration:none;color:white;background:#187b5e;border-radius:8px;padding:13px;margin-top:10px;font-weight:700}#status{overflow-wrap:anywhere;font-size:13px;color:#254b76}.swatches{display:flex;gap:9px;flex-wrap:wrap}.swatch{width:38px;height:38px;padding:0;border:3px solid #fff;box-shadow:0 0 0 1px #b9c5d5;border-radius:50%;margin:0}.swatch.active{box-shadow:0 0 0 3px #253e62}.chip{background:#e6edf6;border-radius:999px;padding:4px 10px;display:inline-block;font-size:12px;color:#3b5274}@media(max-width:850px){main{grid-template-columns:1fr}.preview{position:static}header{padding:16px}section{padding:16px}}
 
@@ -119,6 +119,29 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
  .studio-tab{width:100%;white-space:normal;padding:8px 2px!important;min-width:0;font-size:10px;line-height:1.3}
  .studio-actions{position:relative;bottom:auto;z-index:1}
 }
+
+/* V4.7 visual timeline and per-scene focus timing */
+.timeline-studio{padding:14px;border:1px solid #dce6f2;border-radius:13px;background:#f8faff;margin:8px 0 18px}
+.timeline-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.timeline-top strong{font-size:14px}
+.timeline-top span{font-size:12px;color:#5c7493;font-variant-numeric:tabular-nums}
+.timeline-track{display:flex;gap:3px;width:100%;min-height:58px;overflow:hidden;border-radius:9px}
+.timeline-segment{min-width:0;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin:0!important;padding:7px 4px!important;background:#e5edfb;color:#284d7a;border:1px solid #c9d9f0;border-radius:7px;font-size:11px}
+.timeline-segment:nth-child(even){background:#f1e8fa;border-color:#decdef;color:#5b3e7d}
+.timeline-segment b,.timeline-segment small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timeline-segment small{font-size:10px;color:inherit}
+.timeline-segment:focus-visible{outline:2px solid #c62c50;outline-offset:1px}
+#timelineScrub{width:100%;margin-top:10px;accent-color:#d83254}
+.timeline-controls{display:grid;grid-template-columns:2fr 1fr;gap:9px;margin-top:6px}
+.timeline-controls button{font-size:12px;padding:9px;margin:0!important}
+.timeline-hint{font-size:11px;color:#70819b;margin:10px 0 0}
+.focus-editor{margin-top:11px;border-top:1px dashed #cdd9e9;padding-top:12px}
+.focus-editor strong{display:block;font-size:12px;color:#324862;margin-bottom:6px}
+.focus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+.focus-grid label{font-size:11px;margin:0!important;color:#61738f}
+.focus-grid select,.focus-grid input{display:block;margin-top:5px;width:100%;min-width:0}
+.focus-grid :disabled{opacity:.55}
+@media(max-width:480px){.focus-grid{grid-template-columns:1fr 1fr}.timeline-segment b{font-size:9px}.timeline-studio{padding:9px}}
 </style></head><body><header class="brand-header"><div class="header-inner"><div class="brand-mark" aria-hidden="true">J</div><div class="brand-copy"><strong>JAPANOVA <em>EDU</em></strong><small>Creative Studio</small></div><div class="header-controls"><button id="openProject" type="button" title="Open saved project">📂 <span>Open</span></button><button id="saveProject" type="button" title="Save project">💾 <span>Save</span></button></div></div></header>
 <main><section class="workspace">
 <div class="studio-intro"><div><h1>নতুন রিল তৈরি করুন</h1></div></div>
@@ -167,6 +190,13 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 <div class="twocol"><div><label for="transition">Default Transition</label><select id="transition"><option value="fade" selected>Smooth Fade</option><option value="slide-up">Slide Up</option><option value="slide-left">Slide Left</option></select></div><div><label for="fontSize">Font Size</label><input id="fontSize" type="range" min="52" max="100" value="78"><small id="fontValue">78 px</small></div></div>
 <label>Quick Color Presets</label><div class="swatches" id="swatches"></div><details class="tip help"><summary>ℹ️ Design টিপস</summary><div class="help-content">সব Scene-এর Style উপরের Settings থেকে পরিবর্তন করা যাবে। চাইলে প্রতিটি Scene-এর Color ও Transition আলাদাও করতে পারো। Live Preview এবং MP4 Export একই Text Color, Font Weight ও Effect ব্যবহার করবে।</div></details>
 </div><div id="panel-scenes" class="studio-panel" role="tabpanel" aria-labelledby="tab-scenes" hidden>
+<div class="timeline-studio">
+<div class="timeline-top"><strong>🎞️ Timeline</strong><span id="timelineClock">0.0s / 0.0s</span></div>
+<div id="timelineTrack" class="timeline-track" role="group" aria-label="Select reel scene"></div>
+<input type="range" id="timelineScrub" aria-label="Preview time" min="0" max="30" step="0.05" value="0">
+<div class="timeline-controls"><button id="timelinePlay" type="button" class="secondary">▶ Play from start</button><button id="timelineStart" type="button" class="secondary">↶ Start</button></div>
+<p class="timeline-hint" id="timelineHint">Tap a scene block or drag the scrubber to inspect that moment.</p>
+</div>
 <div class="scene-heading"><div><h2>Scene Editor <small id="total"></small></h2><p class="subtle">প্রতিটি Scene-এর লেখা, Duration ও Transition ঠিক করুন।</p></div><button id="split" class="secondary">✦ Auto Split Sentences</button></div><div id="editor"></div></div>
 <div class="studio-actions"><button id="preview" class="secondary">▶ Preview</button><button id="export">⬇ Export MP4</button></div><div class="export-feedback"><progress id="progress" max="30" value="0"></progress><p role="status" id="status" aria-live="polite" hidden></p><a id="download" hidden>ভিডিও সেভ করুন</a></div><small class="footer-note">Local FFmpeg export • Render চলাকালে অ্যাপ বন্ধ করবেন না।</small>
 </section><section class="preview" id="livePreviewPanel"><div class="preview-heading"><h2>Preview</h2><span id="previewDuration" class="preview-duration">—</span></div><div class="canvas-wrap"><canvas id="canvas" width="720" height="1280"></canvas></div><div class="preview-meta"><span id="previewSceneCount"></span><span>9:16</span></div></section></main>
@@ -180,7 +210,42 @@ function estimateDuration(parts){
  return Math.min(60,Math.max(2.5,speechSeconds+parts.length*.24+.65));
 }
 function prepare(force=false){let raw=$('script').value.trim();if(!raw)throw Error('স্ক্রিপ্ট দিন।');if(!force&&raw===source)return;let parts=sentenceSplit(raw);if(parts.length>20)throw Error('সর্বোচ্চ ২০টি বাক্য দিন।');let weights=parts.map(x=>Math.max(1,x.split(/\s+/).length)),sum=weights.reduce((a,b)=>a+b,0);scenes=parts.map(text=>({text,color:'default',transition:'default'}));let target=$('durationMode').value==='fixed30'?30:estimateDuration(parts);durations=weights.map(w=>.2+(target-parts.length*.2)*w/sum);source=raw;invalidateVoice();editor()}
-function editor(){let root=$('editor');root.replaceChildren();scenes.forEach((s,i)=>{let row=document.createElement('div');row.className='scene';let title=document.createElement('h3');title.textContent='Scene '+(i+1);let ta=document.createElement('textarea');ta.value=s.text;ta.setAttribute('aria-label','Scene text');ta.oninput=()=>{s.text=ta.value;invalidateVoice();draw(0)};let grid=document.createElement('div');grid.className='twocol';let duration=document.createElement('div'),dl=document.createElement('label');dl.textContent='Duration weight (seconds)';let di=document.createElement('input');di.type='number';di.min='.5';di.step='.1';di.value=durations[i].toFixed(2);di.onchange=()=>{durations[i]=Math.max(.5,Number(di.value)||.5);invalidateVoice();total()};duration.append(dl,di);let effect=document.createElement('div'),cl=document.createElement('label');cl.textContent='Text color';let sel=document.createElement('select');for(let [v,n] of [['default','Global color'],['white','Classic White'],['gold','Golden'],['cyan','Cyan Glow'],['pink','Rose Pink'],['rainbow','Gradient']]){let o=new Option(n,v);sel.add(o)}sel.value=s.color;sel.onchange=()=>{s.color=sel.value;draw(0)};effect.append(cl,sel);grid.append(duration,effect);let transWrap=document.createElement('div'),tl=document.createElement('label');tl.textContent='Transition';let tr=document.createElement('select');for(let [v,n] of [['default','Global transition'],['fade','Fade'],['slide-up','Slide Up'],['slide-left','Slide Left'],])tr.add(new Option(n,v));tr.value=s.transition;tr.onchange=()=>{s.transition=tr.value;draw(0)};transWrap.append(tl,tr);row.append(title,ta,grid,transWrap);root.append(row)});total()}
+function editor(){let root=$('editor');root.replaceChildren();scenes.forEach((s,i)=>{let row=document.createElement('div');row.className='scene';let title=document.createElement('h3');title.textContent='Scene '+(i+1);let ta=document.createElement('textarea');ta.value=s.text;ta.setAttribute('aria-label','Scene text');ta.oninput=()=>{s.text=ta.value;invalidateVoice();draw(0)};let grid=document.createElement('div');grid.className='twocol';let duration=document.createElement('div'),dl=document.createElement('label');dl.textContent='Duration weight (seconds)';let di=document.createElement('input');di.type='number';di.min='.5';di.step='.1';di.value=durations[i].toFixed(2);di.onchange=()=>{
+ if(voiceData&&voiceSignature===signature()){di.value=durations[i].toFixed(2);return}
+ const proposed=Number(di.value);
+ const cap=$('durationMode').value==='fixed30'?30:60;
+ const rest=durations.reduce((a,b)=>a+b,0)-durations[i];
+ if(!Number.isFinite(proposed)||proposed<.5||proposed+rest>cap){
+   di.value=durations[i].toFixed(2);$('timelineHint').textContent='Duration must stay between 0.5s and the '+cap+'s project limit.';return
+ }
+ durations[i]=proposed;total();draw(timelineTime);renderTimeline()
+};duration.append(dl,di);let effect=document.createElement('div'),cl=document.createElement('label');cl.textContent='Text color';let sel=document.createElement('select');for(let [v,n] of [['default','Global color'],['white','Classic White'],['gold','Golden'],['cyan','Cyan Glow'],['pink','Rose Pink'],['rainbow','Gradient']]){let o=new Option(n,v);sel.add(o)}sel.value=s.color;sel.onchange=()=>{s.color=sel.value;draw(0)};effect.append(cl,sel);grid.append(duration,effect);let transWrap=document.createElement('div'),tl=document.createElement('label');tl.textContent='Transition';let tr=document.createElement('select');for(let [v,n] of [['default','Global transition'],['fade','Fade'],['slide-up','Slide Up'],['slide-left','Slide Left'],])tr.add(new Option(n,v));tr.value=s.transition;tr.onchange=()=>{s.transition=tr.value;draw(0)};transWrap.append(tl,tr);
+const focusBox=document.createElement('div');focusBox.className='focus-editor';
+const focusHead=document.createElement('strong');focusHead.textContent='Smart Object Timing';
+const fg=document.createElement('div');fg.className='focus-grid';
+const modeWrap=document.createElement('label');modeWrap.textContent='Object Mode';
+const mode=document.createElement('select');mode.setAttribute('aria-label','Scene '+(i+1)+' object mode');
+for(const [v,label] of [['auto','Auto Detect'],['off','No Object'],['manual','Choose Object']])mode.add(new Option(label,v));
+mode.value=s.focusMode||'auto';modeWrap.append(mode);
+const kindWrap=document.createElement('label');kindWrap.textContent='Object';
+const kind=document.createElement('select');kind.setAttribute('aria-label','Scene '+(i+1)+' object type');
+for(const item of motionKeywords)kind.add(new Option(item.label,item.id));
+kind.value=s.focusTopic||'coe';kindWrap.append(kind);
+const offsetWrap=document.createElement('label');offsetWrap.textContent='Appear after (seconds)';
+const offsetInput=document.createElement('input');offsetInput.type='number';offsetInput.min='0';offsetInput.max='60';offsetInput.step='.1';offsetInput.value=String(s.focusOffset??.3);offsetInput.setAttribute('aria-label','Scene '+(i+1)+' object offset');offsetWrap.append(offsetInput);
+const lengthWrap=document.createElement('label');lengthWrap.textContent='Visible for (seconds)';
+const lengthInput=document.createElement('input');lengthInput.type='number';lengthInput.min='.1';lengthInput.max='2.6';lengthInput.step='.1';lengthInput.value=String(s.focusLength??1.6);lengthInput.setAttribute('aria-label','Scene '+(i+1)+' object duration');lengthWrap.append(lengthInput);
+fg.append(modeWrap,kindWrap,offsetWrap,lengthWrap);focusBox.append(focusHead,fg);
+function focusChanged(){
+ s.focusMode=mode.value;s.focusTopic=kind.value;
+ s.focusOffset=Number(offsetInput.value);s.focusLength=Number(lengthInput.value);
+ const manual=mode.value==='manual';kind.disabled=!manual;offsetInput.disabled=!manual;lengthInput.disabled=!manual;
+ draw(timelineTime);renderTimeline();
+}
+for(const element of [mode,kind,offsetInput,lengthInput])element.addEventListener('change',focusChanged);
+kind.disabled=mode.value!=='manual';offsetInput.disabled=mode.value!=='manual';lengthInput.disabled=mode.value!=='manual';
+if(voiceData&&voiceSignature===signature()){di.disabled=true;di.title='Scene durations follow the generated narration. To adjust time, change the voice settings or regenerate Voice.'}
+row.append(title,ta,grid,transWrap,focusBox);root.append(row)});total();renderTimeline()}
 function total(){$('total').textContent=' — '+durations.reduce((a,b)=>a+b,0).toFixed(1)+'s total';$('progress').max=Math.max(1,durations.reduce((a,b)=>a+b,0))}
 function timing(){let sum=durations.reduce((a,b)=>a+b,0),frames=Math.max(scenes.length,Math.round(sum*fps)),acc=0,last=0;return durations.map((d,i)=>{acc+=d/sum*frames;let end=i===durations.length-1?frames:Math.round(acc),n=Math.max(1,end-last);last=end;return n/fps})}
 function reelLength(){return timing().reduce((a,b)=>a+b,0)}
@@ -313,25 +378,46 @@ const motionKeywords=[
  {id:'language',label:'JAPANESE LANGUAGE',emoji:'📘',score:77,pattern:/জাপানি ভাষা|language|jlpt|জেএলপিটি|ভাষা শেখা/i},
  {id:'japan',label:'JAPAN TRAVEL',emoji:'✈️',score:60,pattern:/(japan|জাপান).*(যাও|যাত্রা|ফ্লাইট|travel|flight|ticket)|(?:যাও|যাত্রা|ফ্লাইট|travel|flight|ticket).*(japan|জাপান)/i}
 ];
-function motionItems(){
+function motionItems(strict=false){
  if($('motionMode').value==='off')return [];
- const ds=timing();let proposals=[],start=0;
+ const ds=timing();let auto=[],manual=[],start=0;
  scenes.forEach((scene,i)=>{
-   const matched=motionKeywords.filter(x=>x.pattern.test(scene.text)).sort((a,b)=>b.score-a.score);
-   if(matched.length&&ds[i]>=1.35){
-     const best=matched[0];
-     const length=Math.min(2.5,Math.max(.85,ds[i]*.49));
-     const offset=Math.min(.55,Math.max(.2,(ds[i]-length)*.25));
-     proposals.push({scene:i,id:best.id,label:best.label,emoji:best.emoji,score:best.score,start:start+offset,duration:Math.min(length,ds[i]-offset-.1)});
+   const mode=scene.focusMode||'auto';
+   if(mode==='manual'){
+     const kind=motionKeywords.find(k=>k.id===scene.focusTopic);
+     const offset=Number(scene.focusOffset),requested=Number(scene.focusLength);
+     const valid=kind&&Number.isFinite(offset)&&Number.isFinite(requested)
+       &&offset>=0&&requested>=.1&&requested<=2.6
+       &&offset+requested<=ds[i]-.05;
+     if(valid){
+       manual.push({scene:i,id:kind.id,label:kind.label,emoji:kind.emoji,
+         score:1000,start:start+offset,duration:requested});
+     }else if(strict)throw Error('Scene '+(i+1)+': Smart Object timing must fit inside the scene.');
+   }else if(mode!=='off'){
+     const matched=motionKeywords.filter(x=>x.pattern.test(scene.text)).sort((a,b)=>b.score-a.score);
+     if(matched.length&&ds[i]>=1.35){
+       const best=matched[0],length=Math.min(2.5,Math.max(.85,ds[i]*.49));
+       const offset=Math.min(.55,Math.max(.2,(ds[i]-length)*.25));
+       auto.push({scene:i,id:best.id,label:best.label,emoji:best.emoji,score:best.score,
+         start:start+offset,duration:Math.min(length,ds[i]-offset-.1)});
+     }
    }
    start+=ds[i];
  });
- // Quality over quantity: strongest distinct topics, never repeat a category.
- let selected=[],used=new Set();
- for(const p of [...proposals].sort((a,b)=>b.score-a.score||a.start-b.start)){
-   if(used.has(p.id)||selected.some(other=>Math.abs(other.start-p.start)<3.8))continue;
-   selected.push(p);used.add(p.id);
-   if(selected.length===3)break;
+ if(strict&&manual.length>3)throw Error('Maximum 3 manually selected Smart Objects per reel.');
+ const selected=[],used=new Set();
+ for(const item of manual.sort((a,b)=>a.start-b.start)){
+   if(used.has(item.id)||selected.some(other=>Math.abs(other.start-item.start)<3.8)){
+     if(strict)throw Error('Smart Objects must use different topics and start at least 3.8s apart.');
+     continue;
+   }
+   if(selected.length>=3)break;
+   selected.push(item);used.add(item.id);
+ }
+ for(const item of auto.sort((a,b)=>b.score-a.score||a.start-b.start)){
+   if(selected.length>=3)break;
+   if(used.has(item.id)||selected.some(other=>Math.abs(other.start-item.start)<3.8))continue;
+   selected.push(item);used.add(item.id);
  }
  return selected.sort((a,b)=>a.start-b.start);
 }
@@ -478,6 +564,7 @@ async function presenterPNG(pose){
 }
 function checkBeforeExport(){
  if(!scenes.length)throw Error('No scenes. Click Auto Split Sentences.');
+ motionItems(true);
  if(scenes.some(s=>!s.text.trim()))throw Error('Empty scene found. Complete or delete that scene.');
  if(scenes.some(s=>s.text.length>400))throw Error('A scene exceeds 400 characters. Split it into shorter sentences.');
  const count=scenes.reduce((sum,s)=>sum+s.text.length,0);
@@ -502,7 +589,9 @@ let projectURL=null;
 function captureProject(){
  prepare();
  const settings={};for(const id of PROJECT_SETTINGS)settings[id]=$(id).value;
- const validScenes=scenes.map(s=>({text:s.text,color:s.color,transition:s.transition}));
+ const validScenes=scenes.map(s=>({text:s.text,color:s.color,transition:s.transition,
+ focusMode:s.focusMode||'auto',focusTopic:s.focusTopic||'coe',
+ focusOffset:s.focusOffset??.3,focusLength:s.focusLength??1.6}));
  return {format:'japanova-reel-project',version:1,saved_at:new Date().toISOString(),script:$('script').value,
          settings,scenes:validScenes,durations:[...durations],
          narration:voiceData&&voiceSignature===signature()?{signature:voiceSignature,word_timings:wordTimings,timing_source:wordTimingSource}:null};
@@ -563,7 +652,11 @@ async function loadProject(file){
    $('script').value=data.script;
    for(const [id,value] of Object.entries(data.settings||{}))if(PROJECT_SETTINGS.includes(id))safeSetting(id,value);
    source=data.script;
-   scenes=data.scenes.map(s=>({text:s.text,color:s.color||'default',transition:s.transition||'default'}));
+   scenes=data.scenes.map(s=>({text:s.text,color:s.color||'default',transition:s.transition||'default',
+ focusMode:['auto','off','manual'].includes(s.focusMode)?s.focusMode:'auto',
+ focusTopic:motionKeywords.some(k=>k.id===s.focusTopic)?s.focusTopic:'coe',
+ focusOffset:Number.isFinite(Number(s.focusOffset))?Number(s.focusOffset):.3,
+ focusLength:Number.isFinite(Number(s.focusLength))?Number(s.focusLength):1.6}));
    durations=data.durations.map(Number);
    syncCanvas();
    editor();
@@ -590,7 +683,7 @@ $('saveProject').onclick=saveProject;
 $('openProject').onclick=()=>$('projectFile').click();
 $('projectFile').onchange=()=>{if($('projectFile').files[0])loadProject($('projectFile').files[0])};
 
-async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems().map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.5.1.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
+async function exportReel(){if(locked)return;try{prepare();if($('voice').value!=='off')await ensureVoice();checkBeforeExport();locked=true;cancelAnimationFrame(raf);if(bg instanceof HTMLVideoElement)bg.pause();for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=true;syncCanvas();let fd=new FormData();let times=timing(),media=$('media').files[0],music=$('music').files[0];fd.append('settings',JSON.stringify({quality:$('quality').value,count:scenes.length,durations:times,transitions:scenes.map(s=>s.transition==='default'?$('transition').value:s.transition),subtitles:$('subtitleMode').value!=='off',subtitle_mode:$('subtitleMode').value,subtitle_position:$('subtitlePosition').value,subtitle_rows:$('subtitleMode').value==='short'?scenes.map((_,i)=>shortWordFrames(i).map(w=>w.start)):[],avatar:$('avatar').value,avatar_position:$('avatarPosition').value,motion_items:motionItems(true).map(({scene,id,start,duration})=>({scene,id,start,duration})),motion_style:$('motionStyle').value,motion_position:$('motionPosition').value,motion_size:Number($('motionSize').value)}));if(media)fd.append('media',media,media.name);if(music)fd.append('music',music,music.name);if(voiceData&&$('voice').value!=='off')fd.append('voice',voiceData,'voice.mp3');for(const item of motionItems())fd.append('motion'+item.scene,await motionBlob(item),'motion'+item.scene+'.png');if($('avatar').value!=='off'){for(const pose of ['closed','open','blink'])fd.append('avatar_'+pose,await presenterPNG(pose),'avatar-'+pose+'.png')}draw(0,'base');fd.append('base',await blobPNG(),'base.png');for(let i=0;i<scenes.length;i++){draw(0,'overlay',i);fd.append('scene'+i,await blobPNG(),`scene${i}.png`);if($('subtitleMode').value==='short'){fd.append('subtitle'+i,await shortSubtitlePNG(i),`subtitle${i}.png`)}else if($('subtitleMode').value==='scene'){draw(0,'subtitle',i);fd.append('subtitle'+i,await blobPNG(),`subtitle${i}.png`)}}draw(0);$('status').textContent='CPU দিয়ে MP4 তৈরি হচ্ছে…';$('download').hidden=true;const res=await fetch('/render',{method:'POST',body:fd});if(!res.ok)throw Error('Export failed: '+(await res.text()).replace(/<[^>]*>/g,' ').slice(-700));if(outURL)URL.revokeObjectURL(outURL);outURL=URL.createObjectURL(await res.blob());$('download').href=outURL;$('download').download='japanova-reel-v4.7.mp4';$('download').hidden=false;$('progress').max=reelLength();$('progress').value=reelLength();$('status').textContent='MP4 প্রস্তুত! ${reelLength().toFixed(1)}s video. Download লিংকে ক্লিক করুন।'}catch(err){$('status').textContent=err.message}finally{locked=false;for(let el of document.querySelectorAll('input,textarea,select,button'))el.disabled=false;draw(0)}}
 $('media').onchange=()=>{if(bg instanceof HTMLVideoElement)bg.pause();if(bgURL)URL.revokeObjectURL(bgURL);bg=null;let f=$('media').files[0];if(!f){draw(0);return}bgURL=URL.createObjectURL(f);let el=f.type.startsWith('video')?document.createElement('video'):new Image();if(el instanceof HTMLVideoElement){el.muted=true;el.loop=true;el.playsInline=true;el.onloadeddata=()=>{bg=el;draw(0)}}else el.onload=()=>{bg=el;draw(0)};el.src=bgURL};
 $('split').onclick=()=>{try{prepare(true);draw(0)}catch(e){$('status').textContent=e.message}};
 $('preview').onclick=async()=>{try{prepare();if($('voice').value!=='off')await ensureVoice();$('status').textContent='Preview চলছে';play()}catch(e){$('status').textContent=e.message}};
@@ -599,6 +692,41 @@ $('durationMode').onchange=()=>{invalidateVoice();prepare(true);draw(0)};
 for(let id of ['theme','textPreset','fontWeight','textEffect','transition','fontSize','brand','subtitleMode','subtitleColor','subtitlePosition','subtitleSize','avatar','avatarPosition','motionMode','motionStyle','motionPosition','motionSize'])$(id).addEventListener('input',()=>{$('fontValue').textContent=$('fontSize').value+' px';$('subtitleSizeValue').textContent=$('subtitleSize').value+'px';$('motionSizeValue').textContent=$('motionSize').value+'%';draw(0)});
 $('quality').onchange=()=>{cancelAnimationFrame(raf);syncCanvas();draw(0)};
 let sw=$('swatches');for(let [v,a] of Object.entries(colors)){let btn=document.createElement('button');btn.className='swatch'+(v==='gold'?' active':'');btn.title=v;btn.style.background=`linear-gradient(135deg,${a[0]},${a[1]})`;btn.onclick=()=>{$('textPreset').value=v;for(let b of sw.children)b.classList.remove('active');btn.classList.add('active');draw(0)};sw.append(btn)}
+
+
+let timelineTime=0;
+function timelineJump(value){
+ const max=Math.max(.01,reelLength()-.001);timelineTime=Math.max(0,Math.min(max,Number(value)||0));
+ cancelAnimationFrame(raf);$('voiceAudio').pause();
+ if(bg instanceof HTMLVideoElement)bg.pause();
+ draw(timelineTime);
+ $('timelineScrub').value=timelineTime.toFixed(2);
+ $('timelineClock').textContent=timelineTime.toFixed(1)+'s / '+reelLength().toFixed(1)+'s';
+ $('progress').value=timelineTime;
+}
+function renderTimeline(){
+ if(!$('timelineTrack')||!scenes.length)return;
+ const el=$('timelineTrack');el.replaceChildren();
+ const ds=timing(),max=Math.max(.1,reelLength());
+ $('timelineScrub').max=max.toFixed(3);
+ let current=0;
+ scenes.forEach((scene,i)=>{
+   const button=document.createElement('button');button.type='button';button.className='timeline-segment';
+   button.style.flex=ds[i]+' 1 0px';
+   button.title='Scene '+(i+1)+': '+ds[i].toFixed(1)+' seconds';
+   const a=document.createElement('b');a.textContent='Scene '+(i+1);
+   const b=document.createElement('small');b.textContent=ds[i].toFixed(1)+'s';
+   button.append(a,b);
+   const offset=current;
+   button.onclick=()=>timelineJump(offset+.03);
+   el.append(button);current+=ds[i];
+ });
+ $('timelineScrub').value=Math.min(timelineTime,max).toFixed(2);
+ $('timelineClock').textContent=Math.min(timelineTime,max).toFixed(1)+'s / '+max.toFixed(1)+'s';
+}
+$('timelineScrub').addEventListener('input',()=>timelineJump($('timelineScrub').value));
+$('timelineStart').onclick=()=>timelineJump(0);
+$('timelinePlay').onclick=()=>{timelineJump(0);play()};
 
 /* Compact multi-panel editor. Switch views without rebuilding the form,
    so voice, scene edits and file input state are preserved. */
