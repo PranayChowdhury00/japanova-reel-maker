@@ -131,6 +131,7 @@ section{border:1px solid var(--line);box-shadow:0 8px 32px #172c4809;border-radi
 .timeline-segment b,.timeline-segment small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .timeline-segment small{font-size:10px;color:inherit}
 .timeline-segment:focus-visible{outline:2px solid #c62c50;outline-offset:1px}
+.timeline-segment.selected{outline:2px solid #d83254;outline-offset:-2px;background:#fff0f4;color:#b72f50}
 #timelineScrub{width:100%;margin-top:10px;accent-color:#d83254}
 .timeline-controls{display:grid;grid-template-columns:2fr 1fr;gap:9px;margin-top:6px}
 .timeline-controls button{font-size:12px;padding:9px;margin:0!important}
@@ -549,7 +550,7 @@ $('voice').onchange=()=>{invalidateVoice();draw(0)};
 $('voiceSpeed').oninput=()=>{$('speedValue').textContent=Number($('voiceSpeed').value).toFixed(2)+'×';invalidateVoice()};
 $('generateVoice').onclick=async()=>{try{prepare();await ensureVoice();$('voiceAudio').play().catch(()=>{})}catch(e){$('status').textContent=e.message}};
 $('stopVoice').onclick=()=>{$('voiceAudio').pause();if(bg instanceof HTMLVideoElement)bg.pause();cancelAnimationFrame(raf)};
-function play(){cancelAnimationFrame(raf);$('voiceAudio').pause();if(voiceData&&$('voice').value!=='off'){$('voiceAudio').currentTime=0;$('voiceAudio').play().catch(()=>{})}if(bg instanceof HTMLVideoElement){bg.currentTime=0;bg.play().catch(()=>{})}let start=performance.now(),length=reelLength();$('progress').max=length;function tick(now){let elapsed=(now-start)/1000;let t=Math.min(Math.max(0,length-.001),voiceData&&$('voice').value!=='off'&&!$('voiceAudio').paused?Math.max(elapsed,$('voiceAudio').currentTime):elapsed);draw(t);$('progress').value=t;if(elapsed<length)raf=requestAnimationFrame(tick);else{if(bg instanceof HTMLVideoElement)bg.pause();$('voiceAudio').pause();$('status').textContent='Preview শেষ'}}raf=requestAnimationFrame(tick)}
+function play(){cancelAnimationFrame(raf);$('voiceAudio').pause();if(voiceData&&$('voice').value!=='off'){$('voiceAudio').currentTime=0;$('voiceAudio').play().catch(()=>{})}if(bg instanceof HTMLVideoElement){bg.currentTime=0;bg.play().catch(()=>{})}let start=performance.now(),length=reelLength();$('progress').max=length;function tick(now){let elapsed=(now-start)/1000;let t=Math.min(Math.max(0,length-.001),voiceData&&$('voice').value!=='off'&&!$('voiceAudio').paused?Math.max(elapsed,$('voiceAudio').currentTime):elapsed);draw(t);$('progress').value=t;timelineTime=t;if($('timelineScrub')){$('timelineScrub').value=t.toFixed(2);$('timelineClock').textContent=t.toFixed(1)+'s / '+length.toFixed(1)+'s';markTimelineScene()}if(elapsed<length)raf=requestAnimationFrame(tick);else{if(bg instanceof HTMLVideoElement)bg.pause();$('voiceAudio').pause();$('status').textContent='Preview শেষ'}}raf=requestAnimationFrame(tick)}
 function blobPNG(){return new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(Error('PNG capture failed')),'image/png'))}
 async function presenterPNG(pose){
  const who=$('avatar').value;if(who==='off')return null;
@@ -703,6 +704,12 @@ function timelineJump(value){
  $('timelineScrub').value=timelineTime.toFixed(2);
  $('timelineClock').textContent=timelineTime.toFixed(1)+'s / '+reelLength().toFixed(1)+'s';
  $('progress').value=timelineTime;
+ markTimelineScene();
+}
+function markTimelineScene(){
+ const parts=timing();let start=0,selected=0;
+ for(let i=0;i<parts.length;i++){if(timelineTime>=start)selected=i;start+=parts[i]}
+ [...$('timelineTrack').children].forEach((element,i)=>element.classList.toggle('selected',i===selected));
 }
 function renderTimeline(){
  if(!$('timelineTrack')||!scenes.length)return;
@@ -723,6 +730,7 @@ function renderTimeline(){
  });
  $('timelineScrub').value=Math.min(timelineTime,max).toFixed(2);
  $('timelineClock').textContent=Math.min(timelineTime,max).toFixed(1)+'s / '+max.toFixed(1)+'s';
+ markTimelineScene();
 }
 $('timelineScrub').addEventListener('input',()=>timelineJump($('timelineScrub').value));
 $('timelineStart').onclick=()=>timelineJump(0);
