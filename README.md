@@ -119,3 +119,19 @@ This release adds scene-aware editing controls in the **Scenes** tab:
 - Presenter on/off is scene-level rather than a per-frame entrance animation.
 - Script and voice generation remain limited to 60 seconds in Auto mode.
 - JavaScript syntax, manual/auto focus selection, invalid timing and duplicate topic checks were exercised; unit regression tests are in `tests/test_timeline.py`. End-to-end FFmpeg export on Windows and mobile is still unverified here.
+
+## V4.8 — Custom Image & Object Library (2026-11-28)
+
+Implemented in the repository. JavaScript syntax and integration points were reviewed; full Windows FFmpeg export requires local end-to-end confirmation.
+
+- Upload up to 8 PNG, JPG or WebP images (12MB maximum per source, auto-resized for projects). Transparent PNGs retain transparency.
+- In Scenes, select a scene on the Timeline, then click Use on the chosen library image. One custom image per scene; this is separate from auto-detected Smart Objects.
+- Drag the image within Preview, resize using the cyan lower-right handle, or edit its X/Y/Width numerically (1080×1920 logical coordinates).
+- Set Appear after and Visible for to place the image in the scene's timeline.
+- Reuse an image across multiple scenes; remove a scene image separately from the library.
+- The browser attempts to retain the image library locally. Portable .jrm files embed the images; saving the project is the reliable backup. Old projects remain compatible.
+- MP4 export composites the same custom transparent PNG images at the same times; selection handles are not exported.
+
+Instructions: run git pull origin main; restart START.bat; hard-refresh with Ctrl+Shift+R. Open Scenes, upload an image, select a scene, tap Use, drag/resize in Preview, adjust the timing, preview and Export MP4. Save and reopen a .jrm to check portability.
+
+Limits: one custom image per scene; eight reusable assets/layers maximum. No rotation, multi-image per scene, freeform keyframes or animated GIF support yet. Images and timings must remain within their scene/frame bounds. Multiple full-frame PNG overlays may use considerable CPU/RAM during rendering; test at Lite 540p first. Browser local storage can be erased, so keep a .jrm file for important projects. Regression tests were added in tests/test_custom_images.py but real Windows FFmpeg encoding has not been run in this session.
