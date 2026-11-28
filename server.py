@@ -43,8 +43,8 @@ def project_json(data):
     ):raise ValueError('Invalid project settings')
     durations=project.get('durations',[])
     if not isinstance(durations,list) or len(durations)!=len(scenes) or any(
-        not isinstance(d,(float,int)) or isinstance(d,bool) or not .04<=d<=30 for d in durations
-    ) or not .5<=sum(durations)<=30.05:raise ValueError('Invalid project durations')
+        not isinstance(d,(float,int)) or isinstance(d,bool) or not .04<=d<=60 for d in durations
+    ) or not .5<=sum(durations)<=60.05:raise ValueError('Invalid project durations')
     return project
 
 
@@ -54,7 +54,7 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
     transitions=settings['transitions']
     if not 1<=count<=20 or len(durations)!=count or len(transitions)!=count: raise ValueError('Invalid scenes')
     total_seconds=sum(durations)
-    if any(not isinstance(d,(float,int)) or d<=0 or d>30 for d in durations) or not .5<=total_seconds<=30.02: raise ValueError('Invalid scene durations')
+    if any(not isinstance(d,(float,int)) or d<=0 or d>60 for d in durations) or not .5<=total_seconds<=60.05: raise ValueError('Invalid scene durations')
     if any(t not in TRANSITIONS for t in transitions): raise ValueError('Invalid transition')
     ff=shutil.which('ffmpeg')
     if not ff: raise RuntimeError('FFmpeg missing; install then restart START.bat')
