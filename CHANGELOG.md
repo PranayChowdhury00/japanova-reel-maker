@@ -96,3 +96,11 @@
 - Per-scene Presenter visibility, Caption visibility and Caption Delay in preview and FFmpeg render.
 - Lock voice-synced durations after generation and preserve all timeline controls in .jrm projects.
 - Added regression tests for timeline export filter generation; Windows full export test pending.
+
+## V4.8 — Custom Image & Object Library (2026-11-28)
+- Reusable PNG/JPG/WebP image library with optimization and portable project embedding.
+- Per-scene image placement, touch/pointer drag, corner resize and numeric controls.
+- Per-scene image timing, with matching transparent FFmpeg overlay layers.
+- Browser-local library persistence where available; embedded assets in .jrm.
+- Added tests for export graph layers, timing validation and project images.
+- End-to-end Windows FFmpeg encoding remains to be verified.
