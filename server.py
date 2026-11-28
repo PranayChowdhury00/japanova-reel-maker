@@ -363,6 +363,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_header('Cache-Control','public, max-age=3600')
             self.send_header('Content-Length',str(len(data)))
             self.end_headers();self.wfile.write(data);return
+        if path.path=='/custom_assets.js':
+            data=(ROOT/'custom_assets.js').read_bytes()
+            self.send_response(200)
+            self.send_header('Content-Type','application/javascript; charset=utf-8')
+            self.send_header('Cache-Control','no-store')
+            self.send_header('Content-Length',str(len(data)))
+            self.end_headers();self.wfile.write(data);return
         if path.path!='/': self.send_error(404);return
         data=(ROOT/'index.html').read_bytes()
         self.send_response(200)
