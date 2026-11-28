@@ -89,3 +89,33 @@ Previously, scripts requiring over 29.6 seconds of TTS triggered HTTP 400 even w
 - Added a regression test suite at `tests/test_duration.py` (run `python -m unittest discover -s tests -v`). Runtime tests in a real browser and Windows/Cloud FFmpeg environment remain necessary.
 
 Update locally using `git pull origin main`, restart `START.bat`, hard-refresh the page with `Ctrl+Shift+R`, choose Auto Duration and generate voice again.
+
+## V4.7 — Smart Timeline Editor (2026-11-28)
+
+This release adds scene-aware editing controls in the **Scenes** tab:
+
+- **Timeline strips:** proportional scene blocks, click any block to inspect its first frame, or drag the scrubber to a precise moment. Play from Start highlights the currently active scene.
+- **Scene duration:** manually adjust when no generated voice is locked. Once voice is generated, its scene durations are locked to prevent audio and word highlights drifting out of sync. Change narration settings and regenerate voice to get fresh durations.
+- **Smart Object controls per scene:** Auto Detect (default), No Object, or Choose Object. Manual mode lets you set its category, the number of seconds after the scene begins when it appears, and how long it stays (up to 2.6 seconds).
+- **Per-scene captions:** Show/Hide and Caption Delay within that scene.
+- **Per-scene presenter:** Show/Hide. Presenter lip and blink overlays follow that visibility in the exported video.
+- **Focus moment safeguards:** the reel still uses at most three distinct object categories with starts at least 3.8 seconds apart. Export warns on invalid manual focus timing. Global Smart Objects Off continues to disable all focus moments.
+- **Portable project persistence:** new V4.7 timeline controls are saved into existing `.jrm` project format. Older project files remain supported; missing fields default to Auto Object and visible Presenter/Captions.
+- **Export parity:** the same per-scene timings and visibility are sent to FFmpeg for rendered MP4, not merely for editor preview.
+
+### How to use
+
+1. Update as usual: `git pull origin main`, then `.\START.bat`. Hard-refresh the browser with `Ctrl+Shift+R`.
+2. Open **Scenes** and click a scene block in the timeline. Drag the scrubber to inspect the animation.
+3. Scroll to the chosen scene. Select **Object Mode → Choose Object** to override keyword detection, set **Appear after** and **Visible for**.
+4. Toggle **Show Presenter** or **Show Captions** and optionally set a **Caption delay**.
+5. Preview, Export MP4, and verify the changes are present in the downloaded file.
+6. Save a `.jrm` project and reopen it to verify the timeline controls persist.
+
+### Limitations
+
+- This is a **scene timeline with manually adjustable focus moments**, not a full multitrack nonlinear video editor. Custom image placement and freeform keyframes are planned separately.
+- Caption delay offsets visibility within the scene; it does not re-time TTS word boundaries. Hiding captions does not delete the voice audio.
+- Presenter on/off is scene-level rather than a per-frame entrance animation.
+- Script and voice generation remain limited to 60 seconds in Auto mode.
+- JavaScript syntax, manual/auto focus selection, invalid timing and duplicate topic checks were exercised; unit regression tests are in `tests/test_timeline.py`. End-to-end FFmpeg export on Windows and mobile is still unverified here.
