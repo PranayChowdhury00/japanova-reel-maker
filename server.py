@@ -56,6 +56,17 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
     total_seconds=sum(durations)
     if any(not isinstance(d,(float,int)) or d<=0 or d>60 for d in durations) or not .5<=total_seconds<=60.05: raise ValueError('Invalid scene durations')
     if any(t not in TRANSITIONS for t in transitions): raise ValueError('Invalid transition')
+    caption_visible=settings.get('caption_visible',[True]*count)
+    avatar_visible=settings.get('avatar_visible',[True]*count)
+    caption_delays=settings.get('caption_delays',[0.]*count)
+    if any(not isinstance(seq,list) or len(seq)!=count for seq in
+           (caption_visible,avatar_visible,caption_delays)):
+        raise ValueError('Invalid per-scene visibility settings')
+    if any(type(v) is not bool for v in caption_visible+avatar_visible):
+        raise ValueError('Invalid visibility type')
+    if any(not isinstance(delay,(float,int)) or isinstance(delay,bool) or
+           not 0<=delay<duration for delay,duration in zip(caption_delays,durations)):
+        raise ValueError('Caption delay must fit its scene')
     ff=shutil.which('ffmpeg')
     if not ff: raise RuntimeError('FFmpeg missing; install then restart START.bat')
     cmd=[ff,'-hide_banner','-loglevel','error','-y','-threads','2']
@@ -172,18 +183,24 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
             avatar_w=f'trunc({aw}*(1-0.25*({frame_focus}))/2)*2'
             avatar_h=f'trunc({ah}*(1-0.25*({frame_focus}))/2)*2'
             filters.append(f'[{avatar_stream}:v]scale=w={avatar_w}:h={avatar_h}:eval=frame,format=rgba[avatar{j}]')
-        # Existing position and mouth/blink streams remain synchronous.
+        # Use one shared visibility expression for body, mouth and blinking.
         xpos=f'{ax}+({target_x-ax})*({time_focus})'
         ypos=f'{ay}+({target_y-ay})*({time_focus})'
-        filters.append(f'[{previous}][avatar0]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass[body]')
+        allowed=[];scene_start=0.
+        for visible,scene_duration in zip(avatar_visible,durations):
+            if visible:
+                allowed.append(f'between(t\\,{scene_start:.5f}\\,{scene_start+scene_duration:.5f})')
+            scene_start+=scene_duration
+        visibility_expr='+'.join(allowed) if allowed else '0'
+        filters.append(f'[{previous}][avatar0]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable={visibility_expr}[body]')
         previous='body'
         intervals=mouth_intervals(p/'voice.mp3' if has_voice else None)
         if intervals:
             expression=open_expression(intervals)
-            filters.append(f'[{previous}][avatar1]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable={expression}[speaking]')
+            filters.append(f'[{previous}][avatar1]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable=({expression})*({visibility_expr})[speaking]')
             previous='speaking'
         blink='+'.join(f'between(t\\,{float(v):.2f}\\,{float(v)+.12:.2f})' for v in (2.8,6.9,11.4,16.1,20.9,26.3))
-        filters.append(f'[{previous}][avatar2]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable={blink}[blinking]')
+        filters.append(f'[{previous}][avatar2]overlay=x={xpos}:y={ypos}:shortest=0:eof_action=pass:enable=({blink})*({visibility_expr})[blinking]')
         previous='blinking'
     if motion_items:
         motion_width=max(2,round(w*(350/1080)*(size/100)/2)*2)
@@ -212,6 +229,13 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
             end=start+duration
             label=f'caption{i}'
             input_index=first+count+i
+            caption_start=start+float(caption_delays[i])
+            if not caption_visible[i]:
+                # Still consume image input in the graph to keep stream
+                # indexes stable; but make its visibility expression zero.
+                caption_enable='0'
+            else:
+                caption_enable=f'between(t\\,{caption_start:.5f}\\,{end:.5f})'
             if subtitle_mode=='short':
                 # Each scene supplies ONE vertical PNG sprite, with a caption
                 # for each word. Dynamic crop selects rows without hundreds
@@ -233,12 +257,12 @@ def make_command(p, settings, media, music, still=False, has_voice=False):
                 ox=round((w-round(w*900/1080))/2)
                 filters.append(
                     f'[{previous}][{source}]overlay=x={ox}:y={oy}:shortest=0:'
-                    f'eof_action=pass:enable=between(t\\,{start:.5f}\\,{end:.5f})[{label}]'
+                    f'eof_action=pass:enable={caption_enable}[{label}]'
                 )
             else:
                 filters.append(
                     f'[{previous}][{input_index}:v]overlay=x=0:y=0:'
-                    f'shortest=0:eof_action=pass:enable=between(t\\,{start:.6f}\\,{end:.6f})[{label}]'
+                    f'shortest=0:eof_action=pass:enable={caption_enable}[{label}]'
                 )
             previous=label
             start=end
