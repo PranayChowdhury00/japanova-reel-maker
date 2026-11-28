@@ -10,7 +10,7 @@ let customEditing=true;
 
 function customAsset(id){return imageLibrary.find(a=>a.id===id)||null}
 function activeCustomScene(){return scenes[active(timelineTime).i]||null}
-function customImageForScene(scene){return scene&&scene.custom?customImageCache.get(scene.custom.assetId):null}
+function customImageForScene(scene){const image=scene&&scene.custom?customImageCache.get(scene.custom.assetId):null;return image&&image.complete&&image.naturalWidth>0?image:null}
 function safeCustom(obj){
  if(!obj||typeof obj!=='object'||typeof obj.assetId!=='string')return null;
  const numeric=(v,f)=>Number.isFinite(Number(v))?Number(v):f;
@@ -208,7 +208,7 @@ canvasElement.addEventListener('pointermove',event=>{
  if(p.resize){
    const ratio=img.naturalHeight/img.naturalWidth;
    const width=Math.max(50,Math.min(1080-p.x,(1920-p.y)/ratio,
-      p.w+(x-p.startX), (p.w+(y-p.startY)/ratio)));
+      p.w+(Math.abs(x-p.startX)>Math.abs(y-p.startY)?x-p.startX:(y-p.startY)/ratio)));
    p.scene.custom.w=Math.round(width);
  }else{
    const ratio=img.naturalHeight/img.naturalWidth,height=p.w*ratio;
